@@ -1,0 +1,153 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Candidate {
+  id                    String   @id @default(cuid())
+  applicationNumber     String   @unique
+  firstName             String
+  lastName              String
+  middleName            String?
+  email                 String   @unique
+  phone                 String
+  dateOfBirth           DateTime
+  gender                String
+  address               String
+  lga                   String
+  state                 String
+  country               String
+  utmeScore             Int
+  olevelResults         Json     // Store O'level results as JSON
+  passportPhoto         String?  // URL to passport photo
+  programId             String
+  screeningStatus       ScreeningStatus @default(PENDING)
+  totalScore            Float?
+  remarks               String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  program               Program  @relation(fields: [programId], references: [id])
+  screeningResults      ScreeningResult[]
+  auditLogs             AuditLog[]
+
+  @@map("candidates")
+}
+
+model Program {
+  id                    String   @id @default(cuid())
+  name                  String
+  code                  String   @unique
+  department            String
+  faculty               String
+  duration              Int      // in years
+  capacity              Int      // maximum number of students
+  utmeCutOffMark        Int      // minimum UTME score required
+  olevelRequirements    Json     // Required O'level subjects and grades
+  isActive              Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  candidates            Candidate[]
+  screeningCriteria     ScreeningCriteria[]
+
+  @@map("programs")
+}
+
+model ScreeningCriteria {
+  id                    String   @id @default(cuid())
+  name                  String
+  description           String?
+  maxScore              Float
+  weight                Float    // Weight in final calculation (0-1)
+  programId             String
+  isActive              Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  program               Program  @relation(fields: [programId], references: [id])
+  screeningResults      ScreeningResult[]
+
+  @@map("screening_criteria")
+}
+
+model ScreeningResult {
+  id                    String   @id @default(cuid())
+  candidateId           String
+  criteriaId            String
+  score                 Float
+  remarks               String?
+  screenedBy            String   // Admin/staff name
+  screenedAt            DateTime @default(now())
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  candidate             Candidate @relation(fields: [candidateId], references: [id])
+  criteria              ScreeningCriteria @relation(fields: [criteriaId], references: [id])
+
+  @@unique([candidateId, criteriaId])
+  @@map("screening_results")
+}
+
+model Admin {
+  id                    String   @id @default(cuid())
+  email                 String   @unique
+  password              String
+  name                  String
+  role                  AdminRole @default(OFFICER)
+  department            String?
+  isActive              Boolean  @default(true)
+  lastLoginAt           DateTime?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  auditLogs             AuditLog[]
+
+  @@map("admins")
+}
+
+model AuditLog {
+  id                    String   @id @default(cuid())
+  action                String   // e.g., "CREATE_CANDIDATE", "UPDATE_SCORE", "GENERATE_REPORT"
+  description           String?
+  entityType            String   // e.g., "CANDIDATE", "SCREENING_RESULT"
+  entityId              String?
+  performedBy           String   // Admin email
+  oldValues             Json?    // Previous values before change
+  newValues             Json?    // New values after change
+  ipAddress             String?
+  userAgent             String?
+  createdAt             DateTime @default(now())
+
+  admin                 Admin?   @relation(fields: [performedBy], references: [email])
+  candidate             Candidate? @relation(fields: [entityId], references: [id])
+
+  @@map("audit_logs")
+}
+
+enum ScreeningStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  APPROVED
+  REJECTED
+  SHORTLISTED
+  ADMISSION_OFFERED
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  OFFICER
+  HOD
+  DEAN
+}
