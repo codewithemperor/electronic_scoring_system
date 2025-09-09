@@ -35,7 +35,7 @@ export default function CandidateScreeningPage() {
         name: 'Document Verification',
         status: 'COMPLETED',
         progress: 100,
-        completedDate: '2024-01-10',
+        completedDate: '2025-01-10',
         details: 'All required documents have been verified and approved'
       },
       {
@@ -91,7 +91,7 @@ export default function CandidateScreeningPage() {
     {
       id: 1,
       title: 'Post-UTME Examination',
-      date: '2024-02-01',
+      date: '2025-02-01',
       time: '9:00 AM',
       location: 'Computer Science Laboratory',
       type: 'examination',
@@ -101,7 +101,7 @@ export default function CandidateScreeningPage() {
     {
       id: 2,
       title: 'Document Verification Follow-up',
-      date: '2024-01-25',
+      date: '2025-01-25',
       time: '2:00 PM',
       location: 'Admission Office',
       type: 'meeting',
@@ -114,28 +114,28 @@ export default function CandidateScreeningPage() {
     {
       id: 1,
       activity: 'Document Upload Completed',
-      date: '2024-01-08',
+      date: '2025-01-08',
       status: 'completed',
       details: 'All required documents successfully uploaded'
     },
     {
       id: 2,
       activity: 'Document Verification Started',
-      date: '2024-01-09',
+      date: '2025-01-09',
       status: 'completed',
       details: 'Admission office began document verification process'
     },
     {
       id: 3,
       activity: 'Document Verification Completed',
-      date: '2024-01-10',
+      date: '2025-01-10',
       status: 'completed',
       details: 'All documents verified and approved'
     },
     {
       id: 4,
       activity: 'Academic Evaluation Started',
-      date: '2024-01-12',
+      date: '2025-01-12',
       status: 'in_progress',
       details: 'Evaluation of UTME and O\'Level scores in progress'
     }

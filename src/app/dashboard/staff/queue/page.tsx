@@ -41,12 +41,12 @@ export default function StaffQueuePage() {
       candidate: {
         firstName: 'Amina',
         lastName: 'Bello',
-        jambNumber: 'JAMB2024001',
+        jambNumber: 'JAMB2025001',
         email: 'amina.bello@email.com',
         phone: '+234 801 234 5678'
       },
       program: 'Computer Science',
-      scheduledTime: '2024-01-16 09:00',
+      scheduledTime: '2025-01-16 09:00',
       status: 'pending',
       priority: 'high',
       estimatedDuration: 30,
@@ -60,12 +60,12 @@ export default function StaffQueuePage() {
       candidate: {
         firstName: 'Chukwu',
         lastName: 'Emeka',
-        jambNumber: 'JAMB2024002',
+        jambNumber: 'JAMB2025002',
         email: 'chukwu.emeka@email.com',
         phone: '+234 802 345 6789'
       },
       program: 'Computer Science',
-      scheduledTime: '2024-01-16 09:30',
+      scheduledTime: '2025-01-16 09:30',
       status: 'in_progress',
       priority: 'medium',
       estimatedDuration: 45,
@@ -73,7 +73,7 @@ export default function StaffQueuePage() {
       oLevelScore: 26,
       documentsVerified: true,
       screeningStage: 'Academic Evaluation',
-      startTime: '2024-01-16 09:35',
+      startTime: '2025-01-16 09:35',
       elapsedTime: 15
     },
     {
@@ -81,12 +81,12 @@ export default function StaffQueuePage() {
       candidate: {
         firstName: 'Fatima',
         lastName: 'Ibrahim',
-        jambNumber: 'JAMB2024003',
+        jambNumber: 'JAMB2025003',
         email: 'fatima.ibrahim@email.com',
         phone: '+234 803 456 7890'
       },
       program: 'Computer Science',
-      scheduledTime: '2024-01-16 10:00',
+      scheduledTime: '2025-01-16 10:00',
       status: 'pending',
       priority: 'high',
       estimatedDuration: 30,
@@ -100,12 +100,12 @@ export default function StaffQueuePage() {
       candidate: {
         firstName: 'David',
         lastName: 'Okafor',
-        jambNumber: 'JAMB2024004',
+        jambNumber: 'JAMB2025004',
         email: 'david.okafor@email.com',
         phone: '+234 804 567 8901'
       },
       program: 'Computer Science',
-      scheduledTime: '2024-01-16 10:30',
+      scheduledTime: '2025-01-16 10:30',
       status: 'pending',
       priority: 'low',
       estimatedDuration: 30,
@@ -119,12 +119,12 @@ export default function StaffQueuePage() {
       candidate: {
         firstName: 'Sarah',
         lastName: 'Johnson',
-        jambNumber: 'JAMB2024005',
+        jambNumber: 'JAMB2025005',
         email: 'sarah.johnson@email.com',
         phone: '+234 805 678 9012'
       },
       program: 'Computer Science',
-      scheduledTime: '2024-01-16 11:00',
+      scheduledTime: '2025-01-16 11:00',
       status: 'completed',
       priority: 'medium',
       estimatedDuration: 40,
@@ -132,7 +132,7 @@ export default function StaffQueuePage() {
       oLevelScore: 28,
       documentsVerified: true,
       screeningStage: 'Completed',
-      completedAt: '2024-01-16 08:45',
+      completedAt: '2025-01-16 08:45',
       totalScore: 85,
       screeningOfficer: 'John Doe'
     }

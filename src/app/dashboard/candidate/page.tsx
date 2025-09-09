@@ -28,7 +28,7 @@ export default function CandidateDashboard() {
   const profile = {
     firstName: 'John',
     lastName: 'Doe',
-    jambNumber: 'JAMB2024001',
+    jambNumber: 'JAMB2025001',
     utmeScore: 245,
     screeningStatus: 'IN_PROGRESS',
     profileCompletion: 75
@@ -39,14 +39,14 @@ export default function CandidateDashboard() {
       id: 'APP001',
       program: 'Computer Science',
       status: 'Under Review',
-      appliedDate: '2024-01-10',
+      appliedDate: '2025-01-10',
       screeningScore: null
     },
     {
       id: 'APP002',
       program: 'Electrical Engineering',
       status: 'Pending',
-      appliedDate: '2024-01-12',
+      appliedDate: '2025-01-12',
       screeningScore: null
     }
   ]
@@ -83,12 +83,12 @@ export default function CandidateDashboard() {
     {
       name: 'JAMB Result Slip',
       status: 'uploaded',
-      uploadDate: '2024-01-08'
+      uploadDate: '2025-01-08'
     },
     {
       name: 'O\'Level Results',
       status: 'uploaded',
-      uploadDate: '2024-01-08'
+      uploadDate: '2025-01-08'
     },
     {
       name: 'Birth Certificate',
@@ -103,7 +103,7 @@ export default function CandidateDashboard() {
     {
       name: 'Passport Photograph',
       status: 'uploaded',
-      uploadDate: '2024-01-09'
+      uploadDate: '2025-01-09'
     }
   ]
 

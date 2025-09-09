@@ -35,7 +35,7 @@ export default function CandidateApplicationsPage() {
       program: 'Computer Science',
       department: 'Computing & Information Technology',
       status: 'Under Review',
-      appliedDate: '2024-01-10',
+      appliedDate: '2025-01-10',
       screeningScore: null,
       utmeScore: 245,
       oLevelScore: 28,
@@ -50,7 +50,7 @@ export default function CandidateApplicationsPage() {
       program: 'Electrical Engineering',
       department: 'Engineering Technology',
       status: 'Pending',
-      appliedDate: '2024-01-12',
+      appliedDate: '2025-01-12',
       screeningScore: null,
       utmeScore: 245,
       oLevelScore: 28,
@@ -65,7 +65,7 @@ export default function CandidateApplicationsPage() {
       program: 'Business Administration',
       department: 'Management Sciences',
       status: 'Approved',
-      appliedDate: '2024-01-08',
+      appliedDate: '2025-01-08',
       screeningScore: 85,
       utmeScore: 245,
       oLevelScore: 28,
@@ -85,7 +85,7 @@ export default function CandidateApplicationsPage() {
       duration: '4 years',
       capacity: 120,
       requirements: 'UTME: 200, O\'Level: 5 credits including Maths & English',
-      deadline: '2024-02-15'
+      deadline: '2025-02-15'
     },
     {
       id: 'PROG002',
@@ -94,7 +94,7 @@ export default function CandidateApplicationsPage() {
       duration: '4 years',
       capacity: 80,
       requirements: 'UTME: 200, O\'Level: 5 credits including Maths, Physics & English',
-      deadline: '2024-02-15'
+      deadline: '2025-02-15'
     },
     {
       id: 'PROG003',
@@ -103,7 +103,7 @@ export default function CandidateApplicationsPage() {
       duration: '4 years',
       capacity: 150,
       requirements: 'UTME: 180, O\'Level: 5 credits including Maths & English',
-      deadline: '2024-02-15'
+      deadline: '2025-02-15'
     },
     {
       id: 'PROG004',
@@ -112,7 +112,7 @@ export default function CandidateApplicationsPage() {
       duration: '4 years',
       capacity: 100,
       requirements: 'UTME: 180, O\'Level: 5 credits including English & Literature',
-      deadline: '2024-02-15'
+      deadline: '2025-02-15'
     }
   ]
 

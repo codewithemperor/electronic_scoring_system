@@ -91,7 +91,7 @@ export default function AdminDashboard() {
       candidate: 'Sarah Johnson',
       program: 'Computer Science',
       status: 'Under Review',
-      date: '2024-01-15',
+      date: '2025-01-15',
       score: 78
     },
     {
@@ -99,7 +99,7 @@ export default function AdminDashboard() {
       candidate: 'Michael Chen',
       program: 'Electrical Engineering',
       status: 'Approved',
-      date: '2024-01-14',
+      date: '2025-01-14',
       score: 85
     },
     {
@@ -107,7 +107,7 @@ export default function AdminDashboard() {
       candidate: 'Emma Williams',
       program: 'Business Administration',
       status: 'Pending',
-      date: '2024-01-13',
+      date: '2025-01-13',
       score: null
     },
     {
@@ -115,7 +115,7 @@ export default function AdminDashboard() {
       candidate: 'David Brown',
       program: 'Mass Communication',
       status: 'Rejected',
-      date: '2024-01-12',
+      date: '2025-01-12',
       score: 45
     }
   ]

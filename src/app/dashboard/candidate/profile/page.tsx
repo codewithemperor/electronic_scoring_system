@@ -38,7 +38,7 @@ export default function CandidateProfilePage() {
     lastName: 'Doe',
     email: 'john.doe@email.com',
     phone: '+234 801 234 5678',
-    jambNumber: 'JAMB2024001',
+    jambNumber: 'JAMB2025001',
     utmeScore: 245,
     birthDate: '2000-05-15',
     gender: 'Male',
@@ -55,7 +55,7 @@ export default function CandidateProfilePage() {
       name: 'JAMB Result Slip',
       type: 'PDF',
       size: '245 KB',
-      uploadDate: '2024-01-08',
+      uploadDate: '2025-01-08',
       status: 'uploaded',
       url: '/documents/jamb-slip.pdf'
     },
@@ -64,7 +64,7 @@ export default function CandidateProfilePage() {
       name: 'O\'Level Results',
       type: 'PDF',
       size: '1.2 MB',
-      uploadDate: '2024-01-08',
+      uploadDate: '2025-01-08',
       status: 'uploaded',
       url: '/documents/olevel-results.pdf'
     },
@@ -91,7 +91,7 @@ export default function CandidateProfilePage() {
       name: 'Passport Photograph',
       type: 'JPG',
       size: '45 KB',
-      uploadDate: '2024-01-09',
+      uploadDate: '2025-01-09',
       status: 'uploaded',
       url: '/documents/passport.jpg'
     }

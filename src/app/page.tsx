@@ -89,7 +89,7 @@ export default function Home() {
               </div>
             </div>
             <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-              Academic Year 2024/2025
+              Academic Year 2025/2025
             </Badge>
           </div>
         </div>
@@ -310,7 +310,7 @@ export default function Home() {
           </div>
           
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400 text-sm">
-            <p>&copy; 2024 Adeseun Ogundoyin Polytechnic Eruwa. All rights reserved. | Electronic Scoring and Screening System</p>
+            <p>&copy; 2025 Adeseun Ogundoyin Polytechnic Eruwa. All rights reserved. | Electronic Scoring and Screening System</p>
           </div>
         </div>
       </footer>

@@ -57,7 +57,7 @@ export default function StaffDashboard() {
     {
       id: 'SCR001',
       candidate: 'Amina Bello',
-      jambNumber: 'JAMB2024001',
+      jambNumber: 'JAMB2025001',
       program: 'Computer Science',
       time: '9:00 AM',
       status: 'Completed',
@@ -66,7 +66,7 @@ export default function StaffDashboard() {
     {
       id: 'SCR002',
       candidate: 'Chukwu Emeka',
-      jambNumber: 'JAMB2024002',
+      jambNumber: 'JAMB2025002',
       program: 'Computer Science',
       time: '9:30 AM',
       status: 'In Progress',
@@ -75,7 +75,7 @@ export default function StaffDashboard() {
     {
       id: 'SCR003',
       candidate: 'Fatima Ibrahim',
-      jambNumber: 'JAMB2024003',
+      jambNumber: 'JAMB2025003',
       program: 'Computer Science',
       time: '10:00 AM',
       status: 'Pending',
@@ -84,7 +84,7 @@ export default function StaffDashboard() {
     {
       id: 'SCR004',
       candidate: 'David Okafor',
-      jambNumber: 'JAMB2024004',
+      jambNumber: 'JAMB2025004',
       program: 'Computer Science',
       time: '10:30 AM',
       status: 'Pending',

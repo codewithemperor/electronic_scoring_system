@@ -45,7 +45,7 @@ export default function AdminProgramsPage() {
       description: 'Bachelor of Technology in Computer Science',
       requirements: 'UTME: 200, O\'Level: 5 credits including Maths & English',
       isActive: true,
-      createdAt: '2024-01-01'
+      createdAt: '2025-01-01'
     },
     {
       id: 'PROG002',
@@ -58,7 +58,7 @@ export default function AdminProgramsPage() {
       description: 'Bachelor of Engineering in Electrical Engineering',
       requirements: 'UTME: 200, O\'Level: 5 credits including Maths, Physics & English',
       isActive: true,
-      createdAt: '2024-01-01'
+      createdAt: '2025-01-01'
     },
     {
       id: 'PROG003',
@@ -71,7 +71,7 @@ export default function AdminProgramsPage() {
       description: 'Bachelor of Science in Business Administration',
       requirements: 'UTME: 180, O\'Level: 5 credits including Maths & English',
       isActive: true,
-      createdAt: '2024-01-01'
+      createdAt: '2025-01-01'
     },
     {
       id: 'PROG004',
@@ -84,7 +84,7 @@ export default function AdminProgramsPage() {
       description: 'Bachelor of Science in Mass Communication',
       requirements: 'UTME: 180, O\'Level: 5 credits including English & Literature',
       isActive: true,
-      createdAt: '2024-01-01'
+      createdAt: '2025-01-01'
     }
   ]
 

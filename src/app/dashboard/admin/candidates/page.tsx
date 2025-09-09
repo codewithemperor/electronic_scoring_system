@@ -40,15 +40,15 @@ export default function AdminCandidatesPage() {
       lastName: 'Johnson',
       email: 'sarah.johnson@email.com',
       phone: '+234 801 234 5678',
-      jambNumber: 'JAMB2024001',
+      jambNumber: 'JAMB2025001',
       utmeScore: 265,
       program: 'Computer Science',
       status: 'Under Review',
-      appliedDate: '2024-01-10',
+      appliedDate: '2025-01-10',
       screeningScore: 78,
       profileCompletion: 85,
       documentsUploaded: 4,
-      lastActive: '2024-01-15'
+      lastActive: '2025-01-15'
     },
     {
       id: 'CAND002',
@@ -56,15 +56,15 @@ export default function AdminCandidatesPage() {
       lastName: 'Chen',
       email: 'michael.chen@email.com',
       phone: '+234 802 345 6789',
-      jambNumber: 'JAMB2024002',
+      jambNumber: 'JAMB2025002',
       utmeScore: 245,
       program: 'Electrical Engineering',
       status: 'Approved',
-      appliedDate: '2024-01-08',
+      appliedDate: '2025-01-08',
       screeningScore: 82,
       profileCompletion: 100,
       documentsUploaded: 5,
-      lastActive: '2024-01-14'
+      lastActive: '2025-01-14'
     },
     {
       id: 'CAND003',
@@ -72,15 +72,15 @@ export default function AdminCandidatesPage() {
       lastName: 'Williams',
       email: 'emma.williams@email.com',
       phone: '+234 803 456 7890',
-      jambNumber: 'JAMB2024003',
+      jambNumber: 'JAMB2025003',
       utmeScore: 280,
       program: 'Business Administration',
       status: 'Pending',
-      appliedDate: '2024-01-12',
+      appliedDate: '2025-01-12',
       screeningScore: null,
       profileCompletion: 60,
       documentsUploaded: 3,
-      lastActive: '2024-01-13'
+      lastActive: '2025-01-13'
     },
     {
       id: 'CAND004',
@@ -88,15 +88,15 @@ export default function AdminCandidatesPage() {
       lastName: 'Brown',
       email: 'david.brown@email.com',
       phone: '+234 804 567 8901',
-      jambNumber: 'JAMB2024004',
+      jambNumber: 'JAMB2025004',
       utmeScore: 220,
       program: 'Mass Communication',
       status: 'Under Review',
-      appliedDate: '2024-01-09',
+      appliedDate: '2025-01-09',
       screeningScore: 65,
       profileCompletion: 75,
       documentsUploaded: 4,
-      lastActive: '2024-01-12'
+      lastActive: '2025-01-12'
     },
     {
       id: 'CAND005',
@@ -104,15 +104,15 @@ export default function AdminCandidatesPage() {
       lastName: 'Bello',
       email: 'amina.bello@email.com',
       phone: '+234 805 678 9012',
-      jambNumber: 'JAMB2024005',
+      jambNumber: 'JAMB2025005',
       utmeScore: 290,
       program: 'Computer Science',
       status: 'Rejected',
-      appliedDate: '2024-01-07',
+      appliedDate: '2025-01-07',
       screeningScore: 45,
       profileCompletion: 90,
       documentsUploaded: 5,
-      lastActive: '2024-01-11'
+      lastActive: '2025-01-11'
     }
   ]
 

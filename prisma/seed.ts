@@ -272,7 +272,7 @@ async function main() {
     prisma.candidate.create({
       data: {
         userId: candidateUsers[0].id,
-        jambNumber: 'JAMB2024001',
+        jambNumber: 'JAMB2025001',
         utmeScore: 265,
         birthDate: new Date('2000-05-15'),
         gender: 'Female',
@@ -285,7 +285,7 @@ async function main() {
     prisma.candidate.create({
       data: {
         userId: candidateUsers[1].id,
-        jambNumber: 'JAMB2024002',
+        jambNumber: 'JAMB2025002',
         utmeScore: 245,
         birthDate: new Date('2001-03-20'),
         gender: 'Male',
@@ -298,7 +298,7 @@ async function main() {
     prisma.candidate.create({
       data: {
         userId: candidateUsers[2].id,
-        jambNumber: 'JAMB2024003',
+        jambNumber: 'JAMB2025003',
         utmeScore: 280,
         birthDate: new Date('1999-12-10'),
         gender: 'Female',
@@ -388,7 +388,7 @@ async function main() {
       duration: 60,
       totalMarks: 50,
       passingMarks: 25,
-      scheduledAt: new Date('2024-02-01T09:00:00')
+      scheduledAt: new Date('2025-02-01T09:00:00')
     }
   })
 
@@ -429,21 +429,21 @@ async function main() {
     prisma.systemConfig.create({
       data: {
         key: 'academic_year',
-        value: '2024/2025',
+        value: '2025/2025',
         description: 'Current academic year'
       }
     }),
     prisma.systemConfig.create({
       data: {
         key: 'admission_deadline',
-        value: '2024-02-15',
+        value: '2025-02-15',
         description: 'Admission application deadline'
       }
     }),
 prisma.systemConfig.create({
       data: {
         key: 'exam_schedule',
-        value: '2024-02-01T09:00:00',
+        value: '2025-02-01T09:00:00',
         description: 'Scheduled date and time for Post-UTME exams'
       }
     }),

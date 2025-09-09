@@ -68,7 +68,7 @@ export default function AdminReportsPage() {
       id: 'RPT001',
       name: 'Monthly Applications Summary',
       type: 'applications',
-      generatedDate: '2024-01-15',
+      generatedDate: '2025-01-15',
       generatedBy: 'John Doe',
       size: '2.4 MB',
       format: 'PDF'
@@ -77,7 +77,7 @@ export default function AdminReportsPage() {
       id: 'RPT002',
       name: 'Screening Performance Report',
       type: 'screening',
-      generatedDate: '2024-01-14',
+      generatedDate: '2025-01-14',
       generatedBy: 'Jane Smith',
       size: '1.8 MB',
       format: 'Excel'
@@ -86,7 +86,7 @@ export default function AdminReportsPage() {
       id: 'RPT003',
       name: 'Program Analytics Q4 2023',
       type: 'programs',
-      generatedDate: '2024-01-10',
+      generatedDate: '2025-01-10',
       generatedBy: 'Mike Johnson',
       size: '3.1 MB',
       format: 'PDF'

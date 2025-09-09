@@ -166,7 +166,7 @@ export default function LoginPage() {
               <CardContent className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Academic Year:</span>
-                  <Badge variant="secondary">2024/2025</Badge>
+                  <Badge variant="secondary">2025/2025</Badge>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Status:</span>
