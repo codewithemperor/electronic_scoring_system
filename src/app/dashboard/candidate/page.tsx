@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -21,91 +22,67 @@ import {
 } from 'lucide-react'
 import { useAuth } from '@/contexts/auth-context'
 
+interface ProfileData {
+  firstName: string
+  lastName: string
+  jambNumber: string
+  utmeScore: number
+  screeningStatus: string
+  profileCompletion: number
+}
+
+interface Application {
+  id: string
+  program: string
+  status: string
+  appliedDate: string
+  screeningScore: number | null
+}
+
+interface ScreeningProgress {
+  step: string
+  status: string
+  description: string
+}
+
+interface RequiredDocument {
+  name: string
+  status: string
+  uploadDate: string | null
+}
+
 export default function CandidateDashboard() {
   const { user } = useAuth()
+  const [profile, setProfile] = useState<ProfileData | null>(null)
+  const [applications, setApplications] = useState<Application[]>([])
+  const [screeningProgress, setScreeningProgress] = useState<ScreeningProgress[]>([])
+  const [requiredDocuments, setRequiredDocuments] = useState<RequiredDocument[]>([])
+  const [totalScore, setTotalScore] = useState(0)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
-  // Mock data for demonstration
-  const profile = {
-    firstName: 'John',
-    lastName: 'Doe',
-    jambNumber: 'JAMB2025001',
-    utmeScore: 245,
-    screeningStatus: 'IN_PROGRESS',
-    profileCompletion: 75
+  useEffect(() => {
+    fetchProfileData()
+  }, [])
+
+  const fetchProfileData = async () => {
+    try {
+      const response = await fetch('/api/dashboard/candidate/profile')
+      if (!response.ok) {
+        throw new Error('Failed to fetch profile data')
+      }
+      const data = await response.json()
+      setProfile(data.profile)
+      setApplications(data.applications)
+      setScreeningProgress(data.screeningProgress)
+      setRequiredDocuments(data.requiredDocuments)
+      setTotalScore(data.totalScore)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unknown error occurred')
+    } finally {
+      setLoading(false)
+    }
   }
-
-  const applications = [
-    {
-      id: 'APP001',
-      program: 'Computer Science',
-      status: 'Under Review',
-      appliedDate: '2025-01-10',
-      screeningScore: null
-    },
-    {
-      id: 'APP002',
-      program: 'Electrical Engineering',
-      status: 'Pending',
-      appliedDate: '2025-01-12',
-      screeningScore: null
-    }
-  ]
-
-  const screeningProgress = [
-    {
-      step: 'Profile Completion',
-      status: 'completed',
-      description: 'Basic information and documents'
-    },
-    {
-      step: 'Application Submission',
-      status: 'completed',
-      description: 'Program applications submitted'
-    },
-    {
-      step: 'Document Verification',
-      status: 'in_progress',
-      description: 'Academic documents under review'
-    },
-    {
-      step: 'Screening Evaluation',
-      status: 'pending',
-      description: 'Awaiting screening assessment'
-    },
-    {
-      step: 'Final Decision',
-      status: 'pending',
-      description: 'Admission decision pending'
-    }
-  ]
-
-  const requiredDocuments = [
-    {
-      name: 'JAMB Result Slip',
-      status: 'uploaded',
-      uploadDate: '2025-01-08'
-    },
-    {
-      name: 'O\'Level Results',
-      status: 'uploaded',
-      uploadDate: '2025-01-08'
-    },
-    {
-      name: 'Birth Certificate',
-      status: 'pending',
-      uploadDate: null
-    },
-    {
-      name: 'Local Government Certificate',
-      status: 'pending',
-      uploadDate: null
-    },
-    {
-      name: 'Passport Photograph',
-      status: 'uploaded',
-      uploadDate: '2025-01-09'
-    }
-  ]
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -135,6 +112,65 @@ export default function CandidateDashboard() {
       default:
         return <Clock className="h-5 w-5 text-gray-500" />
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Candidate Dashboard</h1>
+            <p className="text-muted-foreground">Loading your profile...</p>
+          </div>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[...Array(4)].map((_, i) => (
+            <Card key={i}>
+              <CardHeader>
+                <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+              </CardHeader>
+              <CardContent>
+                <div className="h-8 bg-gray-200 rounded animate-pulse"></div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Candidate Dashboard</h1>
+            <p className="text-red-600">Error loading profile data</p>
+          </div>
+        </div>
+        <Card>
+          <CardContent className="pt-6">
+            <p className="text-red-600">{error}</p>
+            <Button onClick={fetchProfileData} className="mt-4">
+              Retry
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  if (!profile) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Candidate Dashboard</h1>
+            <p className="text-muted-foreground">Profile not found</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (

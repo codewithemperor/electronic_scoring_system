@@ -23,6 +23,7 @@ async function main() {
   await prisma.program.deleteMany()
   await prisma.department.deleteMany()
   await prisma.user.deleteMany()
+  await prisma.systemConfig.deleteMany()
 
   // Create Departments
   console.log('📚 Creating departments...')

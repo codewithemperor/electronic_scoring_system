@@ -68,9 +68,23 @@ export default function Home() {
   ]
 
   const handleRoleSelect = (roleId: string) => {
-    setSelectedRole(roleId)
-    // In a real application, this would navigate to the appropriate login page
-    console.log(`Selected role: ${roleId}`)
+    // Navigate to the appropriate login page
+    switch (roleId) {
+      case 'super-admin':
+        window.location.href = '/login/super-admin'
+        break
+      case 'admin':
+        window.location.href = '/login/admin'
+        break
+      case 'staff':
+        window.location.href = '/login/staff'
+        break
+      case 'candidate':
+        window.location.href = '/login/candidate'
+        break
+      default:
+        window.location.href = '/login/candidate'
+    }
   }
 
   return (
@@ -190,21 +204,6 @@ export default function Home() {
               </Card>
             ))}
           </div>
-
-          {selectedRole && (
-            <div className="mt-8 text-center animate-fade-in">
-              <Button 
-                size="lg" 
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg transition-all duration-200 hover:scale-105 hover:shadow-lg"
-                onClick={() => {
-                  // Navigate to login page with selected role
-                  window.location.href = `/login?role=${selectedRole}`
-                }}
-              >
-                Continue to {roles.find(r => r.id === selectedRole)?.title} Portal
-              </Button>
-            </div>
-          )}
         </div>
       </section>
 

@@ -12,6 +12,15 @@ export function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith(path)
   )
 
+  // Login routes that should be protected from authenticated users
+  const loginRoutes = ['/login/super-admin', '/login/admin', '/login/staff', '/login/candidate', '/login']
+  const isLoginRoute = loginRoutes.some(path => 
+    request.nextUrl.pathname.startsWith(path)
+  )
+
+  // Register route
+  const isRegisterRoute = request.nextUrl.pathname.startsWith('/register')
+
   // Role-specific paths
   const rolePaths = {
     '/dashboard/super-admin': UserRole.SUPER_ADMIN,
@@ -20,9 +29,31 @@ export function middleware(request: NextRequest) {
     '/dashboard/candidate': UserRole.CANDIDATE
   }
 
-  // If accessing protected route without token, redirect to login
+  // If accessing login/register route with valid token, redirect to dashboard
+  if ((isLoginRoute || isRegisterRoute) && token) {
+    const payload = verifyToken(token)
+    if (payload) {
+      const redirectPath = `/dashboard/${payload.role.toLowerCase().replace('_', '-')}`
+      return NextResponse.redirect(new URL(redirectPath, request.url))
+    }
+  }
+
+  // If accessing protected route without token, redirect to appropriate role-specific login
   if (isProtectedPath && !token) {
-    const loginUrl = new URL('/login', request.url)
+    // Determine the appropriate login page based on the requested path
+    let loginPath = '/login'
+    
+    if (request.nextUrl.pathname.startsWith('/dashboard/super-admin')) {
+      loginPath = '/login/super-admin'
+    } else if (request.nextUrl.pathname.startsWith('/dashboard/admin')) {
+      loginPath = '/login/admin'
+    } else if (request.nextUrl.pathname.startsWith('/dashboard/staff')) {
+      loginPath = '/login/staff'
+    } else if (request.nextUrl.pathname.startsWith('/dashboard/candidate')) {
+      loginPath = '/login/candidate'
+    }
+    
+    const loginUrl = new URL(loginPath, request.url)
     loginUrl.searchParams.set('redirect', request.nextUrl.pathname)
     return NextResponse.redirect(loginUrl)
   }
@@ -69,6 +100,8 @@ export const config = {
     '/admin/:path*',
     '/staff/:path*',
     '/candidate/:path*',
-    '/api/((?!auth|health).*)'
+    '/login/:path*',
+    '/register/:path*',
+    '/api/((?!auth|health|departments).*)'
   ]
 }
