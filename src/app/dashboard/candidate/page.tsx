@@ -21,6 +21,7 @@ import {
   Eye
 } from 'lucide-react'
 import { useAuth } from '@/contexts/auth-context'
+import { useToast } from '@/hooks/use-toast'
 
 interface ProfileData {
   firstName: string
@@ -53,6 +54,7 @@ interface RequiredDocument {
 
 export default function CandidateDashboard() {
   const { user } = useAuth()
+  const { toast } = useToast()
   const [profile, setProfile] = useState<ProfileData | null>(null)
   const [applications, setApplications] = useState<Application[]>([])
   const [screeningProgress, setScreeningProgress] = useState<ScreeningProgress[]>([])
@@ -77,8 +79,20 @@ export default function CandidateDashboard() {
       setScreeningProgress(data.screeningProgress)
       setRequiredDocuments(data.requiredDocuments)
       setTotalScore(data.totalScore)
+      
+      // Show success toast for successful data load
+      toast({
+        title: "Dashboard Loaded",
+        description: "Your profile data has been loaded successfully.",
+      })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error occurred')
+      // Show error toast for failed data load
+      toast({
+        title: "Loading Failed",
+        description: err instanceof Error ? err.message : 'Failed to load profile data',
+        variant: "destructive",
+      })
     } finally {
       setLoading(false)
     }

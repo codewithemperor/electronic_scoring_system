@@ -13,7 +13,7 @@ export function middleware(request: NextRequest) {
   )
 
   // Login routes that should be protected from authenticated users
-  const loginRoutes = ['/login/super-admin', '/login/admin', '/login/staff', '/login/candidate', '/login']
+  const loginRoutes = ['/login/super-admin', '/login/admin', '/login/staff', '/login/candidate']
   const isLoginRoute = loginRoutes.some(path => 
     request.nextUrl.pathname.startsWith(path)
   )
@@ -64,7 +64,7 @@ export function middleware(request: NextRequest) {
     
     if (!payload) {
       // Token is invalid, clear it and redirect to login
-      const response = NextResponse.redirect(new URL('/login', request.url))
+      const response = NextResponse.redirect(new URL('/login/super-admin', request.url))
       response.cookies.delete('auth-token')
       return response
     }
@@ -100,7 +100,10 @@ export const config = {
     '/admin/:path*',
     '/staff/:path*',
     '/candidate/:path*',
-    '/login/:path*',
+    '/login/super-admin/:path*',
+    '/login/admin/:path*',
+    '/login/staff/:path*',
+    '/login/candidate/:path*',
     '/register/:path*',
     '/api/((?!auth|health|departments).*)'
   ]

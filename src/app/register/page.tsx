@@ -10,10 +10,12 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { GraduationCap, Eye, EyeOff, User, Mail, Lock, Phone, Calendar, MapPin } from 'lucide-react'
 import { useAuth } from '@/contexts/auth-context'
+import { useToast } from '@/hooks/use-toast'
 
 export default function RegisterPage() {
   const router = useRouter()
   const { register, isLoading } = useAuth()
+  const { toast } = useToast()
   
   const [formData, setFormData] = useState({
     email: '',
@@ -58,22 +60,42 @@ export default function RegisterPage() {
     if (!formData.email || !formData.password || !formData.confirmPassword ||
         !formData.firstName || !formData.lastName || !formData.jambNumber) {
       setError('Please fill in all required fields')
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      })
       return false
     }
 
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match')
+      toast({
+        title: "Validation Error",
+        description: "Passwords do not match",
+        variant: "destructive",
+      })
       return false
     }
 
     if (formData.password.length < 8) {
       setError('Password must be at least 8 characters long')
+      toast({
+        title: "Validation Error",
+        description: "Password must be at least 8 characters long",
+        variant: "destructive",
+      })
       return false
     }
 
     const utmeScore = parseInt(formData.utmeScore)
     if (formData.utmeScore && (isNaN(utmeScore) || utmeScore < 0 || utmeScore > 400)) {
       setError('UTME score must be between 0 and 400')
+      toast({
+        title: "Validation Error",
+        description: "UTME score must be between 0 and 400",
+        variant: "destructive",
+      })
       return false
     }
 
@@ -108,11 +130,20 @@ export default function RegisterPage() {
     
     if (result.success) {
       setSuccess('Registration successful! Redirecting to your dashboard...')
+      toast({
+        title: "Registration Successful",
+        description: `Welcome to AOPE Eruwa, ${formData.firstName}! Your account has been created successfully.`,
+      })
       setTimeout(() => {
         router.push('/dashboard/candidate')
       }, 2000)
     } else {
       setError(result.error || 'Registration failed')
+      toast({
+        title: "Registration Failed",
+        description: result.error || 'Registration failed',
+        variant: "destructive",
+      })
     }
   }
 

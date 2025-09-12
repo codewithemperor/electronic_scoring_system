@@ -9,10 +9,12 @@ import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Shield, Eye, EyeOff, GraduationCap } from 'lucide-react'
 import { useAuth } from '@/contexts/auth-context'
+import { useToast } from '@/hooks/use-toast'
 
 export default function SuperAdminLoginPage() {
   const router = useRouter()
-  const { login, isLoading } = useAuth()
+  const { loginSuperAdmin, isLoading } = useAuth()
+  const { toast } = useToast()
   
   const [formData, setFormData] = useState({
     email: '',
@@ -33,15 +35,32 @@ export default function SuperAdminLoginPage() {
 
     if (!formData.email || !formData.password) {
       setError('Please fill in all fields')
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all fields",
+        variant: "destructive",
+      })
       return
     }
 
-    const result = await login(formData.email, formData.password)
+    const result = await loginSuperAdmin(formData.email, formData.password)
     
     if (result.success) {
+      // Show success toast
+      toast({
+        title: "Login Successful",
+        description: `Welcome back!`,
+      })
+      
+      // Redirect to super admin dashboard
       router.push('/dashboard/super-admin')
     } else {
       setError(result.error || 'Login failed')
+      toast({
+        title: "Login Failed",
+        description: result.error || 'Login failed',
+        variant: "destructive",
+      })
     }
   }
 

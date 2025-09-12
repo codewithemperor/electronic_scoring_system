@@ -14,14 +14,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Find user by email
+    // Find user by email with role validation
     const user = await db.user.findUnique({
       where: { email },
       include: {
-        superAdminProfile: true,
-        adminProfile: true,
-        staffProfile: true,
-        candidateProfile: true
+        adminProfile: true
       }
     })
 
@@ -29,6 +26,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Invalid email or password' },
         { status: 401 }
+      )
+    }
+
+    // Validate user role
+    if (user.role !== UserRole.ADMIN) {
+      return NextResponse.json(
+        { error: 'Access denied. Not an Admin account.' },
+        { status: 403 }
       )
     }
 
@@ -85,40 +90,25 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    // Prepare response data based on user role
-    let userData = {
+    // Prepare response data
+    const userData = {
       id: user.id,
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
       role: user.role,
-      lastLogin: user.lastLogin
-    }
-
-    // Add role-specific data
-    switch (user.role) {
-      case UserRole.SUPER_ADMIN:
-        userData = { ...userData, profile: user.superAdminProfile }
-        break
-      case UserRole.ADMIN:
-        userData = { ...userData, profile: user.adminProfile }
-        break
-      case UserRole.STAFF:
-        userData = { ...userData, profile: user.staffProfile }
-        break
-      case UserRole.CANDIDATE:
-        userData = { ...userData, profile: user.candidateProfile }
-        break
+      lastLogin: user.lastLogin,
+      profile: user.adminProfile
     }
 
     return NextResponse.json({
-      message: 'Login successful',
+      message: 'Admin login successful',
       token,
       user: userData
     })
 
   } catch (error) {
-    console.error('Login error:', error)
+    console.error('Admin login error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

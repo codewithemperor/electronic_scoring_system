@@ -17,8 +17,12 @@ interface User {
 interface AuthContextType {
   user: User | null
   token: string | null
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>
-  register: (userData: any) => Promise<{ success: boolean; error?: string }>
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; user?: User }>
+  loginSuperAdmin: (email: string, password: string) => Promise<{ success: boolean; error?: string; user?: User }>
+  loginAdmin: (email: string, password: string) => Promise<{ success: boolean; error?: string; user?: User }>
+  loginStaff: (email: string, password: string) => Promise<{ success: boolean; error?: string; user?: User }>
+  loginCandidate: (email: string, password: string) => Promise<{ success: boolean; error?: string; user?: User }>
+  register: (userData: any) => Promise<{ success: boolean; error?: string; user?: User }>
   logout: () => void
   isLoading: boolean
   isAuthenticated: boolean
@@ -84,12 +88,136 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(data.user)
         setToken(data.token)
         localStorage.setItem('auth-token', data.token)
-        return { success: true }
+        
+        // Set token as cookie for middleware
+        document.cookie = `auth-token=${data.token}; path=/; max-age=86400; secure; samesite=strict`
+        
+        return { success: true, user: data.user }
       } else {
         return { success: false, error: data.error }
       }
     } catch (error) {
       console.error('Login error:', error)
+      return { success: false, error: 'Network error' }
+    }
+  }
+
+  const loginSuperAdmin = async (email: string, password: string) => {
+    try {
+      const response = await fetch('/api/auth/login/super-admin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setUser(data.user)
+        setToken(data.token)
+        localStorage.setItem('auth-token', data.token)
+        
+        // Set token as cookie for middleware
+        document.cookie = `auth-token=${data.token}; path=/; max-age=86400; secure; samesite=strict`
+        
+        return { success: true, user: data.user }
+      } else {
+        return { success: false, error: data.error }
+      }
+    } catch (error) {
+      console.error('Super Admin login error:', error)
+      return { success: false, error: 'Network error' }
+    }
+  }
+
+  const loginAdmin = async (email: string, password: string) => {
+    try {
+      const response = await fetch('/api/auth/login/admin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setUser(data.user)
+        setToken(data.token)
+        localStorage.setItem('auth-token', data.token)
+        
+        // Set token as cookie for middleware
+        document.cookie = `auth-token=${data.token}; path=/; max-age=86400; secure; samesite=strict`
+        
+        return { success: true, user: data.user }
+      } else {
+        return { success: false, error: data.error }
+      }
+    } catch (error) {
+      console.error('Admin login error:', error)
+      return { success: false, error: 'Network error' }
+    }
+  }
+
+  const loginStaff = async (email: string, password: string) => {
+    try {
+      const response = await fetch('/api/auth/login/staff', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setUser(data.user)
+        setToken(data.token)
+        localStorage.setItem('auth-token', data.token)
+        
+        // Set token as cookie for middleware
+        document.cookie = `auth-token=${data.token}; path=/; max-age=86400; secure; samesite=strict`
+        
+        return { success: true, user: data.user }
+      } else {
+        return { success: false, error: data.error }
+      }
+    } catch (error) {
+      console.error('Staff login error:', error)
+      return { success: false, error: 'Network error' }
+    }
+  }
+
+  const loginCandidate = async (email: string, password: string) => {
+    try {
+      const response = await fetch('/api/auth/login/candidate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setUser(data.user)
+        setToken(data.token)
+        localStorage.setItem('auth-token', data.token)
+        
+        // Set token as cookie for middleware
+        document.cookie = `auth-token=${data.token}; path=/; max-age=86400; secure; samesite=strict`
+        
+        return { success: true, user: data.user }
+      } else {
+        return { success: false, error: data.error }
+      }
+    } catch (error) {
+      console.error('Candidate login error:', error)
       return { success: false, error: 'Network error' }
     }
   }
@@ -110,7 +238,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(data.user)
         setToken(data.token)
         localStorage.setItem('auth-token', data.token)
-        return { success: true }
+        
+        // Set token as cookie for middleware
+        document.cookie = `auth-token=${data.token}; path=/; max-age=86400; secure; samesite=strict`
+        
+        return { success: true, user: data.user }
       } else {
         return { success: false, error: data.error }
       }
@@ -136,6 +268,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null)
       setToken(null)
       localStorage.removeItem('auth-token')
+      
+      // Clear the cookie
+      document.cookie = 'auth-token=; path=/; max-age=0; secure; samesite=strict'
     }
   }
 
@@ -143,6 +278,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     user,
     token,
     login,
+    loginSuperAdmin,
+    loginAdmin,
+    loginStaff,
+    loginCandidate,
     register,
     logout,
     isLoading,
