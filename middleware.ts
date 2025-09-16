@@ -24,6 +24,11 @@ export default withAuth(
     if (pathname.startsWith('/examiner') && !['EXAMINER', 'ADMIN', 'SUPER_ADMIN'].includes(token?.role as string)) {
       return NextResponse.redirect(new URL("/unauthorized", req.url))
     }
+
+    // Candidate routes - only candidates should access candidate dashboard
+    if (pathname.startsWith('/candidate/dashboard') && token?.role !== 'CANDIDATE') {
+      return NextResponse.redirect(new URL("/unauthorized", req.url))
+    }
     
     return NextResponse.next()
   },
@@ -33,7 +38,19 @@ export default withAuth(
         const { pathname } = req.nextUrl
         
         // Public routes that don't require authentication
-        const publicRoutes = ['/', '/candidate/register', '/candidate/take-test', '/candidate/success', '/candidate/test-success']
+        const publicRoutes = [
+          '/', 
+          '/candidate/register', 
+          '/candidate/take-test', 
+          '/candidate/success', 
+          '/candidate/test-success',
+          '/candidate/check-result',
+          '/admin/login',
+          '/staff/login',
+          '/examiner/login',
+          '/candidate/login'
+        ]
+        
         if (publicRoutes.some(route => pathname.startsWith(route))) {
           return true
         }

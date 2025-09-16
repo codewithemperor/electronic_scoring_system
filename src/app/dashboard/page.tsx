@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { DashboardLayout } from "@/components/layout/dashboard-layout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -17,18 +17,73 @@ import {
   AlertCircle,
   Plus,
   Eye,
+  Loader2
 } from "lucide-react"
 import Link from "next/link"
+
+interface DashboardStats {
+  totalCandidates?: number
+  activeScreenings?: number
+  totalQuestions?: number
+  totalUsers?: number
+}
+
+interface RecentScreening {
+  id: string
+  name: string
+  status: string
+  candidates: number
+  startDate: string
+  endDate: string
+  academicSession?: string
+}
 
 export default function Dashboard() {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const [stats, setStats] = useState<DashboardStats>({})
+  const [recentScreenings, setRecentScreenings] = useState<RecentScreening[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
 
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/")
     }
   }, [status, router])
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      fetchDashboardData()
+    }
+  }, [status])
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true)
+      
+      // Fetch statistics
+      const statsResponse = await fetch("/api/dashboard/statistics")
+      if (!statsResponse.ok) {
+        throw new Error("Failed to fetch statistics")
+      }
+      const statsData = await statsResponse.json()
+      setStats(statsData)
+
+      // Fetch recent screenings
+      const screeningsResponse = await fetch("/api/dashboard/recent-screenings")
+      if (!screeningsResponse.ok) {
+        throw new Error("Failed to fetch screenings")
+      }
+      const screeningsData = await screeningsResponse.json()
+      setRecentScreenings(screeningsData)
+
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred")
+    } finally {
+      setLoading(false)
+    }
+  }
 
   if (status === "loading") {
     return (
@@ -148,16 +203,51 @@ export default function Dashboard() {
     }
   }
 
+  const getStatsCards = () => {
+    const statsCards = []
+    
+    if (stats.totalCandidates !== undefined) {
+      statsCards.push({ 
+        name: "Total Candidates", 
+        value: stats.totalCandidates.toLocaleString(), 
+        change: "+12%", 
+        icon: Users 
+      })
+    }
+    
+    if (stats.activeScreenings !== undefined) {
+      statsCards.push({ 
+        name: "Active Screenings", 
+        value: stats.activeScreenings.toString(), 
+        change: "+2", 
+        icon: ClipboardList 
+      })
+    }
+    
+    if (stats.totalQuestions !== undefined) {
+      statsCards.push({ 
+        name: "Questions in Bank", 
+        value: stats.totalQuestions.toLocaleString(), 
+        change: "+23%", 
+        icon: BookOpen 
+      })
+    }
+    
+    if (stats.totalUsers !== undefined) {
+      statsCards.push({ 
+        name: "Total Users", 
+        value: stats.totalUsers.toLocaleString(), 
+        change: "+5%", 
+        icon: Users 
+      })
+    }
+
+    return statsCards
+  }
+
   const navigationItems = getNavigationItems()
   const quickActions = getQuickActions()
-
-  // Mock statistics - in real app, these would come from API
-  const stats = [
-    { name: "Total Candidates", value: "1,234", change: "+12%", icon: Users },
-    { name: "Active Screenings", value: "8", change: "+2", icon: ClipboardList },
-    { name: "Questions in Bank", value: "456", change: "+23%", icon: BookOpen },
-    { name: "Completion Rate", value: "87%", change: "+5%", icon: TrendingUp },
-  ]
+  const statsCards = getStatsCards()
 
   return (
     <DashboardLayout>
@@ -176,22 +266,54 @@ export default function Dashboard() {
           </Badge>
         </div>
 
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="flex items-center">
+              <AlertCircle className="h-5 w-5 text-red-600 mr-2" />
+              <p className="text-red-800">{error}</p>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={fetchDashboardData}
+                className="ml-auto"
+              >
+                Retry
+              </Button>
+            </div>
+          </div>
+        )}
+
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((stat) => (
-            <Card key={stat.name}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{stat.name}</CardTitle>
-                <stat.icon className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stat.value}</div>
-                <p className="text-xs text-muted-foreground">
-                  <span className="text-green-600">{stat.change}</span> from last month
-                </p>
-              </CardContent>
-            </Card>
-          ))}
+          {loading ? (
+            Array.from({ length: 4 }).map((_, index) => (
+              <Card key={index}>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <div className="h-4 bg-gray-200 rounded animate-pulse w-20"></div>
+                  <div className="h-4 w-4 bg-gray-200 rounded animate-pulse"></div>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-8 bg-gray-200 rounded animate-pulse w-16"></div>
+                  <div className="h-3 bg-gray-200 rounded animate-pulse w-24 mt-2"></div>
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            statsCards.map((stat) => (
+              <Card key={stat.name}>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">{stat.name}</CardTitle>
+                  <stat.icon className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stat.value}</div>
+                  <p className="text-xs text-muted-foreground">
+                    <span className="text-green-600">{stat.change}</span> from last month
+                  </p>
+                </CardContent>
+              </Card>
+            ))
+          )}
         </div>
 
         {/* Quick Actions */}
@@ -229,27 +351,40 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {[
-                  { name: "ND Admission Screening 2024/2025", status: "ACTIVE", candidates: 234 },
-                  { name: "HND Admission Screening 2024/2025", status: "SCHEDULED", candidates: 156 },
-                  { name: "ND Part-time Screening 2024/2025", status: "COMPLETED", candidates: 89 },
-                ].map((screening, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div>
-                      <h4 className="font-medium">{screening.name}</h4>
-                      <p className="text-sm text-gray-500">{screening.candidates} candidates</p>
+                {loading ? (
+                  Array.from({ length: 3 }).map((_, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="space-y-2">
+                        <div className="h-4 bg-gray-200 rounded animate-pulse w-48"></div>
+                        <div className="h-3 bg-gray-200 rounded animate-pulse w-24"></div>
+                      </div>
+                      <div className="h-6 bg-gray-200 rounded animate-pulse w-16"></div>
                     </div>
-                    <Badge 
-                      variant={
-                        screening.status === "ACTIVE" ? "default" :
-                        screening.status === "SCHEDULED" ? "secondary" :
-                        screening.status === "COMPLETED" ? "outline" : "destructive"
-                      }
-                    >
-                      {screening.status}
-                    </Badge>
+                  ))
+                ) : recentScreenings.length > 0 ? (
+                  recentScreenings.map((screening, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div>
+                        <h4 className="font-medium">{screening.name}</h4>
+                        <p className="text-sm text-gray-500">{screening.candidates} candidates</p>
+                      </div>
+                      <Badge 
+                        variant={
+                          screening.status === "ACTIVE" ? "default" :
+                          screening.status === "SCHEDULED" ? "secondary" :
+                          screening.status === "COMPLETED" ? "outline" : "destructive"
+                        }
+                      >
+                        {screening.status}
+                      </Badge>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <ClipboardList className="h-12 w-12 mx-auto mb-2 text-gray-400" />
+                    <p>No recent screenings found</p>
                   </div>
-                ))}
+                )}
               </div>
             </CardContent>
           </Card>
