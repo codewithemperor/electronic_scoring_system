@@ -1,51 +1,83 @@
-import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
-import { UserRole } from '@prisma/client'
+import { NextAuthOptions } from "next-auth"
+import CredentialsProvider from "next-auth/providers/credentials"
+import bcrypt from "bcryptjs"
+import { db } from "@/lib/db"
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production'
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h'
+export const authOptions: NextAuthOptions = {
+  providers: [
+    CredentialsProvider({
+      name: "credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" }
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          return null
+        }
 
-export interface JWTPayload {
-  userId: string
-  email: string
-  role: UserRole
-}
+        const user = await db.user.findUnique({
+          where: {
+            email: credentials.email
+          }
+        })
 
-export async function hashPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, 12)
-}
+        if (!user || !user.isActive) {
+          return null
+        }
 
-export async function verifyPassword(password: string, hashedPassword: string): Promise<boolean> {
-  return bcrypt.compare(password, hashedPassword)
-}
+        const isPasswordValid = await bcrypt.compare(
+          credentials.password,
+          user.password
+        )
 
-export function generateToken(payload: JWTPayload): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN })
-}
+        if (!isPasswordValid) {
+          return null
+        }
 
-export function verifyToken(token: string): JWTPayload | null {
-  try {
-    return jwt.verify(token, JWT_SECRET) as JWTPayload
-  } catch (error) {
-    return null
-  }
-}
+        // Update last login
+        await db.user.update({
+          where: { id: user.id },
+          data: { lastLogin: new Date() }
+        })
 
-export function extractTokenFromHeader(authHeader: string | undefined): string | null {
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null
-  }
-  return authHeader.substring(7)
-}
-
-export function isTokenExpired(token: string): boolean {
-  try {
-    const decoded = jwt.decode(token) as { exp?: number }
-    if (!decoded || !decoded.exp) {
-      return true
+        return {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role: user.role,
+        }
+      }
+    })
+  ],
+  session: {
+    strategy: "jwt",
+    maxAge: 24 * 60 * 60 // 24 hours
+  },
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.role = user.role
+        token.id = user.id
+        token.firstName = user.firstName
+        token.lastName = user.lastName
+      }
+      return token
+    },
+    async session({ session, token }) {
+      if (token) {
+        session.user.id = token.id as string
+        session.user.role = token.role as string
+        session.user.firstName = token.firstName as string
+        session.user.lastName = token.lastName as string
+      }
+      return session
     }
-    return decoded.exp * 1000 < Date.now()
-  } catch {
-    return true
-  }
+  },
+  pages: {
+    signIn: "/login",
+    signOut: "/login",
+  },
+  secret: process.env.NEXTAUTH_SECRET,
 }

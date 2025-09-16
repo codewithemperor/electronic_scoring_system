@@ -1,6 +1,9 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,330 +13,270 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// User Management Models
-enum UserRole {
-  SUPER_ADMIN
-  ADMIN
-  STAFF
-  CANDIDATE
-}
-
-enum UserStatus {
-  ACTIVE
-  INACTIVE
-  SUSPENDED
-  PENDING
-}
-
+// User Management
 model User {
   id            String   @id @default(cuid())
   email         String   @unique
-  username      String?  @unique
   password      String
   firstName     String
   lastName      String
-  phone         String?
-  role          UserRole
-  status        UserStatus @default(PENDING)
-  emailVerified Boolean  @default(false)
+  role          Role     @default(STAFF)
+  isActive      Boolean  @default(true)
   lastLogin     DateTime?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-
+  
   // Relations
-  superAdminProfile  SuperAdmin?
-  adminProfile      Admin?
-  staffProfile      Staff?
-  candidateProfile  Candidate?
-  auditLogs         AuditLog[]
-  sessions          Session[]
-
+  createdScreenings    Screening[] @relation("CreatedBy")
+  scoredTests         TestScore[] @relation("ScoredBy")
+  auditLogs           AuditLog[]
+  passwordResets      PasswordReset[]
+  
   @@map("users")
 }
 
-model SuperAdmin {
-  id        String @id @default(cuid())
-  userId    String @unique
-  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+model PasswordReset {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("super_admins")
+  
+  user      User     @relation(fields: [email], references: [email])
+  
+  @@map("password_resets")
 }
 
-model Admin {
-  id           String @id @default(cuid())
-  userId       String @unique
-  user         User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  departmentId String?
-  department   Department? @relation(fields: [departmentId], references: [id])
-  
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  @@map("admins")
-}
-
-model Staff {
-  id           String @id @default(cuid())
-  userId       String @unique
-  user         User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  departmentId String
-  department   Department @relation(fields: [departmentId], references: [id])
-  employeeId   String @unique
-  
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  @@map("staff")
-}
-
-model Candidate {
-  id              String @id @default(cuid())
-  userId          String @unique
-  user            User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  jambNumber      String @unique
-  utmeScore       Int?
-  postUtmeScore   Int?
-  oLevelResults   Json?
-  birthDate       DateTime?
-  gender          String?
-  stateOfOrigin   String?
-  lga             String?
-  address         String?
-  passportPhoto   String?
-  screeningStatus ScreeningStatus @default(NOT_STARTED)
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  // Relations
-  applications    Application[]
-  screeningRecords ScreeningRecord[]
-  examResults     ExamResult[]
-
-  @@map("candidates")
-}
-
-// Academic Structure Models
-model Department {
-  id          String @id @default(cuid())
-  name        String @unique
-  code        String @unique
-  description String?
-  faculty     String?
-  
+// Academic Sessions and Programs
+model AcademicSession {
+  id          String   @id @default(cuid())
+  name        String   // e.g., "2024/2025"
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  
+  screenings  Screening[]
+  
+  @@map("academic_sessions")
+}
 
-  // Relations
+model Department {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  code        String   @unique // e.g., "CST", "EEE"
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
   programs    Program[]
-  admins      Admin[]
-  staff       Staff[]
-  criteria    ScreeningCriteria[]
-  exams       Exam[]
-
+  
   @@map("departments")
 }
 
 model Program {
-  id           String @id @default(cuid())
-  name         String
-  code         String @unique
+  id           String   @id @default(cuid())
+  name         String   // e.g., "Computer Science Technology"
+  code         String   @unique // e.g., "CST"
+  level        Level    @default(ND)
   departmentId String
-  department   Department @relation(fields: [departmentId], references: [id])
-  duration     Int // in years
-  capacity     Int?
-  description  String?
-  
+  cutOffMark   Int      @default(40)
+  maxCapacity  Int      @default(50)
+  isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-
-  // Relations
-  applications Application[]
-  criteria     ScreeningCriteria[]
-
+  
+  department   Department @relation(fields: [departmentId], references: [id])
+  candidates   Candidate[]
+  
   @@map("programs")
 }
 
-// Screening System Models
-enum ScreeningStatus {
-  NOT_STARTED
-  IN_PROGRESS
-  COMPLETED
-  FAILED
-  PASSED
-  PENDING_REVIEW
-}
-
-enum ApplicationStatus {
-  PENDING
-  UNDER_REVIEW
-  APPROVED
-  REJECTED
-  WAITLISTED
-}
-
-model Application {
-  id           String @id @default(cuid())
-  candidateId  String
-  candidate    Candidate @relation(fields: [candidateId], references: [id])
-  programId    String
-  program      Program @relation(fields: [programId], references: [id])
-  status       ApplicationStatus @default(PENDING)
-  totalScore   Int?
-  remarks      String?
+// Screening Management
+model Screening {
+  id               String   @id @default(cuid())
+  name             String   // e.g., "ND Admission Screening 2024/2025"
+  academicSessionId String
+  startDate        DateTime
+  endDate          DateTime
+  duration         Int      // in minutes
+  totalMarks       Int      @default(100)
+  passMarks        Int      @default(40)
+  status           ScreeningStatus @default(DRAFT)
+  instructions     String?
+  createdById      String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
   
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  @@unique([candidateId, programId])
-  @@map("applications")
+  academicSession  AcademicSession @relation(fields: [academicSessionId], references: [id])
+  createdBy        User            @relation("CreatedBy", fields: [createdById], references: [id])
+  candidates       Candidate[]
+  questions        Question[]
+  
+  @@map("screenings")
 }
 
-model ScreeningCriteria {
-  id           String @id @default(cuid())
-  name         String
-  description  String?
-  departmentId String
-  department   Department @relation(fields: [departmentId], references: [id])
-  programId    String?
-  program      Program? @relation(fields: [programId], references: [id])
-  weight       Int @default(1)
-  minValue     Int?
-  maxValue     Int?
-  isActive     Boolean @default(true)
+// Candidate Management
+model Candidate {
+  id              String   @id @default(cuid())
+  screeningId     String
+  programId       String
   
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  // Relations
-  screeningRecords ScreeningRecord[]
-
-  @@map("screening_criteria")
+  // Personal Information
+  firstName       String
+  lastName        String
+  middleName      String?
+  email           String
+  phone           String
+  dateOfBirth     DateTime
+  gender          Gender
+  stateOfOrigin   String
+  lga             String
+  
+  // Academic Information
+  schoolName      String
+  graduationYear  Int
+  
+  // O'Level Results (JSON structure)
+  olevelResults   Json     // Array of subjects with grades
+  
+  // Screening Information
+  registrationNumber String @unique
+  hasWritten         Boolean @default(false)
+  totalScore         Float?
+  percentage         Float?
+  status             CandidateStatus @default(REGISTERED)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  screening       Screening     @relation(fields: [screeningId], references: [id])
+  program         Program       @relation(fields: [programId], references: [id])
+  testScores      TestScore[]
+  
+  @@map("candidates")
 }
 
-model ScreeningRecord {
-  id          String @id @default(cuid())
-  candidateId String
-  candidate   Candidate @relation(fields: [candidateId], references: [id])
-  criteriaId  String
-  criteria    ScreeningCriteria @relation(fields: [criteriaId], references: [id])
-  score       Int
-  remarks     String?
-  scoredBy    String // Staff ID
-  scoredAt    DateTime @default(now())
-  
+// Question Bank
+model Subject {
+  id          String   @id @default(cuid())
+  name        String   @unique // e.g., "Mathematics", "English", "Physics"
+  code        String   @unique // e.g., "MTH", "ENG", "PHY"
+  isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
-  @@unique([candidateId, criteriaId])
-  @@map("screening_records")
-}
-
-// Examination System Models
-model Exam {
-  id           String @id @default(cuid())
-  title        String
-  description  String?
-  departmentId String
-  department   Department @relation(fields: [departmentId], references: [id])
-  duration     Int // in minutes
-  totalMarks   Int
-  passingMarks Int
-  isActive     Boolean @default(true)
-  scheduledAt  DateTime?
   
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  // Relations
-  questions    Question[]
-  results      ExamResult[]
-
-  @@map("exams")
+  questions   Question[]
+  
+  @@map("subjects")
 }
 
 model Question {
-  id          String @id @default(cuid())
-  examId      String
-  exam        Exam @relation(fields: [examId], references: [id], onDelete: Cascade)
+  id          String   @id @default(cuid())
+  screeningId String?
+  subjectId   String
   question    String
-  options     Json // Array of options
-  correctAnswer Int
-  marks       Int @default(1)
-  
+  options     Json     // Array of options: ["A) Option 1", "B) Option 2", ...]
+  correctAnswer String // "A", "B", "C", or "D"
+  marks       Int      @default(1)
+  difficulty  Difficulty @default(MEDIUM)
+  isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
+  
+  screening   Screening? @relation(fields: [screeningId], references: [id])
+  subject     Subject    @relation(fields: [subjectId], references: [id])
+  
   @@map("questions")
 }
 
-model ExamResult {
-  id          String @id @default(cuid())
-  candidateId String
-  candidate   Candidate @relation(fields: [candidateId], references: [id])
-  examId      String
-  exam        Exam @relation(fields: [examId], references: [id])
-  answers     Json // Array of selected answers
-  score       Int
-  percentage  Float
-  status      String // PASSED, FAILED, PENDING
-  timeTaken   Int? // in seconds
-  startedAt   DateTime?
-  completedAt DateTime?
+// Test Results
+model TestScore {
+  id             String   @id @default(cuid())
+  candidateId    String
+  questionId     String?
+  selectedAnswer String?
+  isCorrect      Boolean?
+  marks          Float    @default(0)
+  timeTaken      Int?     // in seconds
+  scoredById     String?
+  createdAt      DateTime @default(now())
   
-  createdAt   DateTime @default(now())
+  candidate      Candidate @relation(fields: [candidateId], references: [id])
+  scoredBy       User?     @relation("ScoredBy", fields: [scoredById], references: [id])
+  
+  @@map("test_scores")
+}
+
+// System Configuration
+model SystemConfig {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String
+  description String?
   updatedAt   DateTime @updatedAt
-
-  @@unique([candidateId, examId])
-  @@map("exam_results")
-}
-
-// Security and Logging Models
-model Session {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  token     String   @unique
-  expiresAt DateTime
-  isActive  Boolean  @default(true)
-  ipAddress String?
-  userAgent String?
   
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("sessions")
+  @@map("system_config")
 }
 
+// Audit Logging
 model AuditLog {
   id          String   @id @default(cuid())
   userId      String?
-  user        User?    @relation(fields: [userId], references: [id])
-  action      String
-  entityType  String?
+  action      String   // "LOGIN", "CREATE_CANDIDATE", "UPDATE_SCORE", etc.
+  entity      String   // "User", "Candidate", "Screening", etc.
   entityId    String?
   oldValues   Json?
   newValues   Json?
   ipAddress   String?
   userAgent   String?
+  timestamp   DateTime @default(now())
   
-  createdAt   DateTime @default(now())
-
+  user        User?    @relation(fields: [userId], references: [id])
+  
   @@map("audit_logs")
 }
 
-// System Configuration Models
-model SystemConfig {
-  id          String @id @default(cuid())
-  key         String @unique
-  value       Json
-  description String?
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+// Enums
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  STAFF
+  EXAMINER
+}
 
-  @@map("system_configs")
+enum Level {
+  ND    // National Diploma
+  HND   // Higher National Diploma
+}
+
+enum ScreeningStatus {
+  DRAFT
+  SCHEDULED
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum CandidateStatus {
+  REGISTERED
+  WRITTEN
+  PASSED
+  FAILED
+  ADMITTED
+  REJECTED
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
 }

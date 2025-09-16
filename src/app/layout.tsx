@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
-import { AuthProvider } from "@/contexts/auth-context";
+import { SessionProvider } from "@/components/providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,21 +15,20 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Electronic Scoring and Screening System - Adeseun Ogundoyin Polytechnic Eruwa",
-  description: "Modern electronic scoring and screening system for Adeseun Ogundoyin Polytechnic Eruwa. Automate candidate evaluation, reduce processing time, and enhance admission accuracy.",
-  keywords: ["Electronic Scoring", "Screening System", "Admission", "Polytechnic", "Education", "AOPE Eruwa"],
-  authors: [{ name: "Adeseun Ogundoyin Polytechnic Eruwa" }],
+  title: "Electronic Scoring and Screening System - Adeseun Ogundoyin Polytechnic",
+  description: "Comprehensive electronic scoring and screening system for candidate evaluation and admission processing",
+  keywords: ["Adeseun Ogundoyin Polytechnic", "Screening System", "Admission", "Electronic Scoring", "Education"],
+  authors: [{ name: "Adeseun Ogundoyin Polytechnic" }],
   openGraph: {
-    title: "Electronic Scoring and Screening System - AOPE Eruwa",
-    description: "Automated candidate evaluation system for Adeseun Ogundoyin Polytechnic Eruwa",
-    url: "https://aope.edu.ng",
-    siteName: "AOPE Eruwa",
+    title: "Electronic Scoring and Screening System",
+    description: "Comprehensive electronic scoring and screening system for candidate evaluation and admission processing",
+    siteName: "Adeseun Ogundoyin Polytechnic",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Electronic Scoring System - AOPE Eruwa",
-    description: "Automated candidate evaluation system for Adeseun Ogundoyin Polytechnic Eruwa",
+    title: "Electronic Scoring and Screening System",
+    description: "Comprehensive electronic scoring and screening system for candidate evaluation and admission processing",
   },
 };
 
@@ -43,10 +42,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
-        <AuthProvider>
+        <SessionProvider>
           {children}
           <Toaster />
-        </AuthProvider>
+        </SessionProvider>
       </body>
     </html>
   );
