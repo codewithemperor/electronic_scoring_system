@@ -57,7 +57,7 @@ Status: Successfully Registered
 
 Next Steps:
 1. Keep your registration number safe
-2. Check your email for confirmation
+2. Login with your credentials to access your dashboard
 3. Await further instructions about the test date
 4. Contact support if you have any questions
 
@@ -160,7 +160,7 @@ Generated on: ${new Date().toLocaleString()}
           <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
             <h4 className="font-semibold text-blue-800 mb-2">What's Next?</h4>
             <ul className="text-sm text-blue-700 space-y-1">
-              <li>• Check your email for confirmation</li>
+              <li>• Please login with your credentials to access your dashboard</li>
               <li>• Await test date notification</li>
               <li>• Keep your registration number safe</li>
               <li>• Prepare for the screening test</li>

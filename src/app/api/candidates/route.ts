@@ -120,8 +120,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Hash the password (make sure you have bcryptjs installed)
-    const bcrypt = require('bcryptjs')
-    const hashedPassword = await bcrypt.hash(validatedData.password, 12)
+    const hashedPassword = await bcryptjs.hash(validatedData.password, 12)
 
     // Generate registration number
     const registrationNumber = generateRegistrationNumber()

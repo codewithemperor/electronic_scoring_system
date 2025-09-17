@@ -247,6 +247,7 @@ enum Role {
   ADMIN
   STAFF
   EXAMINER
+  CANDIDATE
 }
 
 enum Level {

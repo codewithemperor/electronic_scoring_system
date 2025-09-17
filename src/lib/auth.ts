@@ -16,38 +16,73 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
-        const user = await db.user.findUnique({
+        // First try to find user in User table (for admin, staff, examiner)
+        let user = await db.user.findUnique({
           where: {
             email: credentials.email
           }
         })
 
-        if (!user || !user.isActive) {
-          return null
+        if (user) {
+          if (!user.isActive) {
+            return null
+          }
+
+          const isPasswordValid = await bcrypt.compare(
+            credentials.password,
+            user.password
+          )
+
+          if (!isPasswordValid) {
+            return null
+          }
+
+          // Update last login
+          await db.user.update({
+            where: { id: user.id },
+            data: { lastLogin: new Date() }
+          })
+
+          return {
+            id: user.id,
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            role: user.role,
+          }
         }
 
-        const isPasswordValid = await bcrypt.compare(
-          credentials.password,
-          user.password
-        )
-
-        if (!isPasswordValid) {
-          return null
-        }
-
-        // Update last login
-        await db.user.update({
-          where: { id: user.id },
-          data: { lastLogin: new Date() }
+        // If not found in User table, try Candidate table
+        const candidate = await db.candidate.findFirst({
+          where: {
+            OR: [
+              { email: credentials.email },
+              { registrationNumber: credentials.email }
+            ]
+          }
         })
 
-        return {
-          id: user.id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          role: user.role,
+        if (candidate) {
+          const isPasswordValid = await bcrypt.compare(
+            credentials.password,
+            candidate.password
+          )
+
+          if (!isPasswordValid) {
+            return null
+          }
+
+          return {
+            id: candidate.id,
+            email: candidate.email,
+            firstName: candidate.firstName,
+            lastName: candidate.lastName,
+            role: "CANDIDATE",
+            registrationNumber: candidate.registrationNumber,
+          }
         }
+
+        return null
       }
     })
   ],
@@ -62,6 +97,9 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id
         token.firstName = user.firstName
         token.lastName = user.lastName
+        if ("registrationNumber" in user) {
+          token.registrationNumber = user.registrationNumber
+        }
       }
       return token
     },
@@ -71,6 +109,9 @@ export const authOptions: NextAuthOptions = {
         session.user.role = token.role as string
         session.user.firstName = token.firstName as string
         session.user.lastName = token.lastName as string
+        if (token.registrationNumber) {
+          session.user.registrationNumber = token.registrationNumber as string
+        }
       }
       return session
     }

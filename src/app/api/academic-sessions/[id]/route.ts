@@ -1,0 +1,92 @@
+import { NextRequest, NextResponse } from "next/server"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth"
+import { db } from "@/lib/db"
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const session = await getServerSession(authOptions)
+    
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const academicSession = await db.academicSession.findUnique({
+      where: { id: params.id }
+    })
+
+    if (!academicSession) {
+      return NextResponse.json({ error: "Academic session not found" }, { status: 404 })
+    }
+
+    return NextResponse.json(academicSession)
+  } catch (error) {
+    console.error("Failed to fetch academic session:", error)
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    )
+  }
+}
+
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const session = await getServerSession(authOptions)
+    
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const body = await request.json()
+    const { name, startDate, endDate, isActive } = body
+
+    const academicSession = await db.academicSession.update({
+      where: { id: params.id },
+      data: {
+        name,
+        startDate: new Date(startDate),
+        endDate: new Date(endDate),
+        isActive
+      }
+    })
+
+    return NextResponse.json(academicSession)
+  } catch (error) {
+    console.error("Failed to update academic session:", error)
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    )
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const session = await getServerSession(authOptions)
+    
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    await db.academicSession.delete({
+      where: { id: params.id }
+    })
+
+    return NextResponse.json({ message: "Academic session deleted successfully" })
+  } catch (error) {
+    console.error("Failed to delete academic session:", error)
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    )
+  }
+}

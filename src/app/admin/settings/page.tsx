@@ -70,16 +70,27 @@ interface SystemConfig {
   description: string | null
 }
 
+interface AcademicSession {
+  id: string
+  name: string
+  startDate: string
+  endDate: string
+  isActive: boolean
+}
+
 export default function AdminSettingsPage() {
   const { data: session } = useSession()
   const [departments, setDepartments] = useState<Department[]>([])
   const [programs, setPrograms] = useState<Program[]>([])
   const [systemConfigs, setSystemConfigs] = useState<SystemConfig[]>([])
+  const [academicSessions, setAcademicSessions] = useState<AcademicSession[]>([])
   const [loading, setLoading] = useState(true)
   const [isDepartmentDialogOpen, setIsDepartmentDialogOpen] = useState(false)
   const [isProgramDialogOpen, setIsProgramDialogOpen] = useState(false)
+  const [isSessionDialogOpen, setIsSessionDialogOpen] = useState(false)
   const [editingDepartment, setEditingDepartment] = useState<Department | null>(null)
   const [editingProgram, setEditingProgram] = useState<Program | null>(null)
+  const [editingSession, setEditingSession] = useState<AcademicSession | null>(null)
 
   const {
     register: registerDepartment,
@@ -97,10 +108,19 @@ export default function AdminSettingsPage() {
     formState: { errors: programErrors },
   } = useForm()
 
+  const {
+    register: registerSession,
+    handleSubmit: handleSessionSubmit,
+    reset: resetSession,
+    setValue: setSessionValue,
+    formState: { errors: sessionErrors },
+  } = useForm()
+
   useEffect(() => {
     fetchDepartments()
     fetchPrograms()
     fetchSystemConfigs()
+    fetchAcademicSessions()
   }, [])
 
   const fetchDepartments = async () => {
@@ -138,6 +158,18 @@ export default function AdminSettingsPage() {
       }
     } catch (error) {
       console.error("Failed to fetch system configs:", error)
+    }
+  }
+
+  const fetchAcademicSessions = async () => {
+    try {
+      const response = await fetch("/api/academic-sessions")
+      if (response.ok) {
+        const data = await response.json()
+        setAcademicSessions(data)
+      }
+    } catch (error) {
+      console.error("Failed to fetch academic sessions:", error)
     }
   }
 
@@ -197,6 +229,34 @@ export default function AdminSettingsPage() {
     }
   }
 
+  const onSessionSubmit = async (data: any) => {
+    try {
+      const url = editingSession ? `/api/academic-sessions/${editingSession.id}` : "/api/academic-sessions"
+      const method = editingSession ? "PUT" : "POST"
+      
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      })
+
+      if (response.ok) {
+        toast.success(`Academic session ${editingSession ? "updated" : "created"} successfully`)
+        setIsSessionDialogOpen(false)
+        resetSession()
+        setEditingSession(null)
+        fetchAcademicSessions()
+      } else {
+        toast.error("Failed to save academic session")
+      }
+    } catch (error) {
+      console.error("Failed to save academic session:", error)
+      toast.error("An error occurred")
+    }
+  }
+
   const handleEditDepartment = (department: Department) => {
     setEditingDepartment(department)
     setDepartmentValue("name", department.name)
@@ -214,6 +274,14 @@ export default function AdminSettingsPage() {
     setProgramValue("cutOffMark", program.cutOffMark)
     setProgramValue("maxCapacity", program.maxCapacity)
     setIsProgramDialogOpen(true)
+  }
+
+  const handleEditSession = (session: AcademicSession) => {
+    setEditingSession(session)
+    setSessionValue("name", session.name)
+    setSessionValue("startDate", session.startDate.split('T')[0])
+    setSessionValue("endDate", session.endDate.split('T')[0])
+    setIsSessionDialogOpen(true)
   }
 
   const handleToggleDepartmentStatus = async (departmentId: string, currentStatus: boolean) => {
@@ -260,6 +328,28 @@ export default function AdminSettingsPage() {
     }
   }
 
+  const handleToggleSessionStatus = async (sessionId: string, currentStatus: boolean) => {
+    try {
+      const response = await fetch(`/api/academic-sessions/${sessionId}/toggle-status`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ isActive: !currentStatus }),
+      })
+
+      if (response.ok) {
+        toast.success(`Academic session ${!currentStatus ? "activated" : "deactivated"} successfully`)
+        fetchAcademicSessions()
+      } else {
+        toast.error("Failed to update academic session status")
+      }
+    } catch (error) {
+      console.error("Failed to update academic session status:", error)
+      toast.error("An error occurred")
+    }
+  }
+
   const openDepartmentDialog = () => {
     setEditingDepartment(null)
     resetDepartment()
@@ -270,6 +360,12 @@ export default function AdminSettingsPage() {
     setEditingProgram(null)
     resetProgram()
     setIsProgramDialogOpen(true)
+  }
+
+  const openSessionDialog = () => {
+    setEditingSession(null)
+    resetSession()
+    setIsSessionDialogOpen(true)
   }
 
   if (loading) {
@@ -298,6 +394,7 @@ export default function AdminSettingsPage() {
           <TabsList>
             <TabsTrigger value="departments">Departments</TabsTrigger>
             <TabsTrigger value="programs">Programs</TabsTrigger>
+            <TabsTrigger value="sessions">Academic Sessions</TabsTrigger>
             <TabsTrigger value="system">System Config</TabsTrigger>
           </TabsList>
 
@@ -492,6 +589,95 @@ export default function AdminSettingsPage() {
                     <p className="text-gray-500 mb-4">Create your first program to get started</p>
                     <Button onClick={openProgramDialog}>
                       Add Program
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="sessions" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center space-x-2">
+                      <BookOpen className="h-5 w-5" />
+                      <span>Academic Sessions</span>
+                    </CardTitle>
+                    <CardDescription>
+                      Manage academic sessions and their time periods
+                    </CardDescription>
+                  </div>
+                  <Button onClick={openSessionDialog}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Session
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Start Date</TableHead>
+                      <TableHead>End Date</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {academicSessions.map((session) => (
+                      <TableRow key={session.id}>
+                        <TableCell className="font-medium">{session.name}</TableCell>
+                        <TableCell>{new Date(session.startDate).toLocaleDateString()}</TableCell>
+                        <TableCell>{new Date(session.endDate).toLocaleDateString()}</TableCell>
+                        <TableCell>
+                          <Badge variant={session.isActive ? "default" : "secondary"}>
+                            <div className="flex items-center space-x-1">
+                              {session.isActive ? (
+                                <ToggleRight className="h-4 w-4" />
+                              ) : (
+                                <ToggleLeft className="h-4 w-4" />
+                              )}
+                              <span>{session.isActive ? "Active" : "Inactive"}</span>
+                            </div>
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center space-x-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEditSession(session)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleToggleSessionStatus(session.id, session.isActive)}
+                            >
+                              {session.isActive ? (
+                                <ToggleRight className="h-4 w-4" />
+                              ) : (
+                                <ToggleLeft className="h-4 w-4" />
+                              )}
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                
+                {academicSessions.length === 0 && (
+                  <div className="text-center py-8">
+                    <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No academic sessions found</h3>
+                    <p className="text-gray-500 mb-4">Create your first academic session to get started</p>
+                    <Button onClick={openSessionDialog}>
+                      Add Session
                     </Button>
                   </div>
                 )}
@@ -717,6 +903,71 @@ export default function AdminSettingsPage() {
                 <Button type="submit">
                   <Save className="h-4 w-4 mr-2" />
                   {editingProgram ? "Update" : "Create"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Session Dialog */}
+        <Dialog open={isSessionDialogOpen} onOpenChange={setIsSessionDialogOpen}>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>
+                {editingSession ? "Edit Academic Session" : "Add New Academic Session"}
+              </DialogTitle>
+              <DialogDescription>
+                {editingSession 
+                  ? "Update the academic session information"
+                  : "Create a new academic session"}
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleSessionSubmit(onSessionSubmit)}>
+              <div className="grid gap-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Session Name *</Label>
+                  <Input
+                    id="name"
+                    {...registerSession("name", { required: "Session name is required" })}
+                    placeholder="e.g., 2024/2025"
+                  />
+                  {sessionErrors.name && (
+                    <p className="text-sm text-red-600">{sessionErrors.name.message}</p>
+                  )}
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="startDate">Start Date *</Label>
+                    <Input
+                      id="startDate"
+                      type="date"
+                      {...registerSession("startDate", { required: "Start date is required" })}
+                    />
+                    {sessionErrors.startDate && (
+                      <p className="text-sm text-red-600">{sessionErrors.startDate.message}</p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="endDate">End Date *</Label>
+                    <Input
+                      id="endDate"
+                      type="date"
+                      {...registerSession("endDate", { required: "End date is required" })}
+                    />
+                    {sessionErrors.endDate && (
+                      <p className="text-sm text-red-600">{sessionErrors.endDate.message}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setIsSessionDialogOpen(false)}>
+                  <X className="h-4 w-4 mr-2" />
+                  Cancel
+                </Button>
+                <Button type="submit">
+                  <Save className="h-4 w-4 mr-2" />
+                  {editingSession ? "Update" : "Create"}
                 </Button>
               </DialogFooter>
             </form>
