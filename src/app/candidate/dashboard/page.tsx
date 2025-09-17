@@ -16,9 +16,11 @@ import {
   BookOpen,
   Calendar,
   Award,
-  Loader2
+  Loader2,
+  Play
 } from "lucide-react"
 import Link from "next/link"
+import { CandidateLayout } from "@/components/layout/candidate-sidebar"
 
 interface CandidateStats {
   registeredScreenings: number
@@ -122,35 +124,27 @@ export default function CandidateDashboard() {
   ] : []
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <CandidateLayout>
+      <div className="space-y-6">
+        {/* Welcome Section */}
+        <div className="bg-white rounded-lg shadow-sm p-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                Candidate Dashboard
-              </h1>
-              <p className="text-sm text-gray-600">
+              <h1 className="text-3xl font-bold text-gray-900">
                 Welcome back, {userName}!
+              </h1>
+              <p className="text-gray-600 mt-2">
+                Here's an overview of your academic progress and available tests.
               </p>
             </div>
-            <div className="flex items-center space-x-4">
-              <Badge variant="secondary">Candidate</Badge>
-              <Link href="/candidate/login">
-                <Button variant="outline" size="sm">
-                  Sign Out
-                </Button>
-              </Link>
-            </div>
+            <Badge variant="secondary" className="text-sm">
+              Candidate Portal
+            </Badge>
           </div>
         </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
             <div className="flex items-center">
               <AlertCircle className="h-5 w-5 text-red-600 mr-2" />
               <p className="text-red-800">{error}</p>
@@ -167,7 +161,7 @@ export default function CandidateDashboard() {
         )}
 
         {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {loading ? (
             Array.from({ length: 4 }).map((_, index) => (
               <Card key={index}>
@@ -199,15 +193,15 @@ export default function CandidateDashboard() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Upcoming Tests */}
+          {/* Available Tests */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
-                <Clock className="h-5 w-5 mr-2 text-orange-600" />
-                Upcoming Tests
+                <Play className="h-5 w-5 mr-2 text-blue-600" />
+                Available Tests
               </CardTitle>
               <CardDescription>
-                Tests you need to take
+                Tests available for your program
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -226,10 +220,12 @@ export default function CandidateDashboard() {
               ) : upcomingTests.length > 0 ? (
                 <div className="space-y-4">
                   {upcomingTests.map((test) => (
-                    <div key={test.id} className="border rounded-lg p-4">
+                    <div key={test.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
                       <div className="flex items-start justify-between mb-2">
                         <h3 className="font-medium text-gray-900">{test.title}</h3>
-                        <Badge variant="outline">{test.status}</Badge>
+                        <Badge variant={test.status === "AVAILABLE" ? "default" : "secondary"}>
+                          {test.status}
+                        </Badge>
                       </div>
                       <div className="space-y-1 text-sm text-gray-600">
                         <div className="flex items-center">
@@ -244,6 +240,7 @@ export default function CandidateDashboard() {
                       <div className="mt-3">
                         <Link href={`/candidate/take-test/${test.id}`}>
                           <Button size="sm" className="w-full">
+                            <Play className="h-4 w-4 mr-2" />
                             Start Test
                           </Button>
                         </Link>
@@ -254,7 +251,8 @@ export default function CandidateDashboard() {
               ) : (
                 <div className="text-center py-8 text-gray-500">
                   <AlertCircle className="h-12 w-12 mx-auto mb-2 text-gray-400" />
-                  <p>No upcoming tests scheduled</p>
+                  <p>No tests available at the moment</p>
+                  <p className="text-sm">Check back later for new test assignments</p>
                 </div>
               )}
             </CardContent>
@@ -316,6 +314,7 @@ export default function CandidateDashboard() {
                 <div className="text-center py-8 text-gray-500">
                   <BookOpen className="h-12 w-12 mx-auto mb-2 text-gray-400" />
                   <p>No completed tests yet</p>
+                  <p className="text-sm">Start with your available tests when ready</p>
                 </div>
               )}
             </CardContent>
@@ -323,7 +322,7 @@ export default function CandidateDashboard() {
         </div>
 
         {/* Quick Actions */}
-        <Card className="mt-8">
+        <Card>
           <CardHeader>
             <CardTitle>Quick Actions</CardTitle>
             <CardDescription>
@@ -332,7 +331,7 @@ export default function CandidateDashboard() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Link href="/candidate/register">
+              <Link href="/candidate/profile">
                 <Button variant="outline" className="w-full justify-start h-auto p-4">
                   <User className="h-5 w-5 mr-3" />
                   <div className="text-left">
@@ -341,21 +340,21 @@ export default function CandidateDashboard() {
                   </div>
                 </Button>
               </Link>
-              <Link href="/candidate/check-result">
+              <Link href="/candidate/test-results">
                 <Button variant="outline" className="w-full justify-start h-auto p-4">
                   <TrendingUp className="h-5 w-5 mr-3" />
                   <div className="text-left">
-                    <div className="font-medium">Check Results</div>
-                    <div className="text-sm text-gray-500">View all your scores</div>
+                    <div className="font-medium">View All Results</div>
+                    <div className="text-sm text-gray-500">Check your performance</div>
                   </div>
                 </Button>
               </Link>
-              <Link href="/candidate/register">
+              <Link href="/candidate/available-tests">
                 <Button variant="outline" className="w-full justify-start h-auto p-4">
-                  <ClipboardList className="h-5 w-5 mr-3" />
+                  <BookOpen className="h-5 w-5 mr-3" />
                   <div className="text-left">
-                    <div className="font-medium">Register for Test</div>
-                    <div className="text-sm text-gray-500">Sign up for screenings</div>
+                    <div className="font-medium">Browse Tests</div>
+                    <div className="text-sm text-gray-500">See all available tests</div>
                   </div>
                 </Button>
               </Link>
@@ -363,6 +362,6 @@ export default function CandidateDashboard() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </CandidateLayout>
   )
 }

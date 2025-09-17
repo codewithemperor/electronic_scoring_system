@@ -91,6 +91,7 @@ model Program {
   
   department   Department @relation(fields: [departmentId], references: [id])
   candidates   Candidate[]
+  programTests  ProgramTest[]
   
   @@map("programs")
 }
@@ -115,6 +116,7 @@ model Screening {
   createdBy        User            @relation("CreatedBy", fields: [createdById], references: [id])
   candidates       Candidate[]
   questions        Question[]
+  programTests     ProgramTest[]
   
   @@map("screenings")
 }
@@ -192,6 +194,22 @@ model Question {
   subject     Subject    @relation(fields: [subjectId], references: [id])
   
   @@map("questions")
+}
+
+// Program Test Assignments
+model ProgramTest {
+  id            String   @id @default(cuid())
+  programId     String
+  screeningId   String
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  program       Program   @relation(fields: [programId], references: [id])
+  screening     Screening @relation(fields: [screeningId], references: [id])
+  
+  @@unique([programId, screeningId])
+  @@map("program_tests")
 }
 
 // Test Results
