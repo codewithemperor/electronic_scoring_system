@@ -113,6 +113,7 @@ export default function Dashboard() {
           { name: "Users", href: "/admin/users", icon: Users },
           { name: "Screenings", href: "/admin/screenings", icon: ClipboardList },
           { name: "Questions", href: "/admin/questions", icon: BookOpen },
+          { name: "Tests", href: "/admin/program-tests", icon: Badge },
           { name: "Reports", href: "/admin/reports", icon: TrendingUp },
         ]
       case "ADMIN":
@@ -134,6 +135,7 @@ export default function Dashboard() {
         return [
           ...baseItems,
           { name: "Questions", href: "/examiner/questions", icon: BookOpen },
+          { name: "Tests", href: "/examiner/program-tests", icon: Badge },
           { name: "Screenings", href: "/examiner/screenings", icon: ClipboardList },
           { name: "Scoring", href: "/examiner/scoring", icon: CheckCircle },
         ]

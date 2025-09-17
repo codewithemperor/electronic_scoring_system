@@ -128,7 +128,7 @@ export default function StaffReportsPage() {
 
   const fetchReports = async () => {
     try {
-      const response = await fetch("/api/reports")
+      const response = await fetch("/api/staff/reports")
       if (response.ok) {
         const data = await response.json()
         setReports(data)
@@ -154,19 +154,19 @@ export default function StaffReportsPage() {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch("/api/reports/stats")
+      const response = await fetch("/api/staff/reports?type=scoring-stats")
       if (response.ok) {
         const data = await response.json()
         setStats(data)
       }
     } catch (error) {
-      console.error("Failed to fetch report stats:", error)
+      console.error("Failed to fetch staff report stats:", error)
     }
   }
 
   const fetchCandidatePerformance = async () => {
     try {
-      const response = await fetch("/api/reports/candidate-performance")
+      const response = await fetch("/api/staff/reports?type=candidate-performance")
       if (response.ok) {
         const data = await response.json()
         setCandidatePerformance(data)
@@ -183,14 +183,17 @@ export default function StaffReportsPage() {
     }
 
     try {
-      const response = await fetch("/api/reports/generate", {
+      const response = await fetch("/api/staff/reports", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          screeningId: selectedScreening,
-          reportType: reportType
+          reportType: reportType,
+          format: "json",
+          filters: {
+            screeningId: selectedScreening
+          }
         }),
       })
 
@@ -210,13 +213,13 @@ export default function StaffReportsPage() {
 
   const handleDownload = async (reportId: string) => {
     try {
-      const response = await fetch(`/api/reports/${reportId}/download`)
+      const response = await fetch(`/api/staff/reports/${reportId}/download`)
       if (response.ok) {
         const blob = await response.blob()
         const url = window.URL.createObjectURL(blob)
         const a = document.createElement('a')
         a.href = url
-        a.download = `report-${reportId}.pdf`
+        a.download = `staff-report-${reportId}.pdf`
         document.body.appendChild(a)
         a.click()
         window.URL.revokeObjectURL(url)
