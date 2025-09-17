@@ -6,7 +6,7 @@ import { hasPermission } from "@/lib/rbac"
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -19,8 +19,10 @@ export async function GET(
       return NextResponse.json({ error: "Insufficient permissions" }, { status: 403 })
     }
 
+    const { id } = await params
+
     const user = await db.user.findUnique({
-      where: { id: params.id },
+      where: { id },
       select: {
         id: true,
         email: true,
@@ -49,7 +51,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -65,8 +67,10 @@ export async function PUT(
     const body = await request.json()
     const { firstName, lastName, email, role } = body
 
+    const { id } = await params
+
     const user = await db.user.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         firstName,
         lastName,
@@ -97,7 +101,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -110,8 +114,10 @@ export async function DELETE(
       return NextResponse.json({ error: "Insufficient permissions" }, { status: 403 })
     }
 
+    const { id } = await params
+
     await db.user.delete({
-      where: { id: params.id },
+      where: { id },
     })
 
     return NextResponse.json({ message: "User deleted successfully" })

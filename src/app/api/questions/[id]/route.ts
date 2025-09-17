@@ -6,7 +6,7 @@ import { hasPermission } from "@/lib/rbac"
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -15,8 +15,10 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    const { id } = await params
+
     const question = await db.question.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         subject: {
           select: {
@@ -48,7 +50,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -64,8 +66,10 @@ export async function PUT(
     const body = await request.json()
     const { question, options, correctAnswer, subjectId, marks, difficulty, screeningId } = body
 
+    const { id } = await params
+
     const questionData = await db.question.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         question,
         options,
@@ -102,7 +106,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -115,8 +119,10 @@ export async function DELETE(
       return NextResponse.json({ error: "Insufficient permissions" }, { status: 403 })
     }
 
+    const { id } = await params
+
     await db.question.delete({
-      where: { id: params.id },
+      where: { id },
     })
 
     return NextResponse.json({ message: "Question deleted successfully" })
