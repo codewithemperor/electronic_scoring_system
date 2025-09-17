@@ -261,7 +261,7 @@ export default function CandidateDashboard() {
                         </div>
                       </div>
                       <div className="mt-3">
-                        <Link href={`/candidate/take-test/${test.id}`}>
+                        <Link href={`/candidate/take-test/${session.user.id}`}>
                           <Button size="sm" className="w-full">
                             <Play className="h-4 w-4 mr-2" />
                             Start Test
@@ -324,7 +324,7 @@ export default function CandidateDashboard() {
                         </div>
                       </div>
                       <div className="mt-3">
-                        <Link href={`/candidate/test-result/${test.id}`}>
+                        <Link href={`/candidate/test-result/${session.user.id}`}>
                           <Button variant="outline" size="sm" className="w-full">
                             View Result
                           </Button>

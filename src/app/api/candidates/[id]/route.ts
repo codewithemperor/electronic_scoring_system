@@ -15,6 +15,7 @@ export async function GET(
     }
 
     const { id } = await params
+    console.log(session)
 
     const candidate = await db.candidate.findUnique({
       where: { id },

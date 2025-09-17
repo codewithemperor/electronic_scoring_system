@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/db'
+import { db } from '@/lib/db'
 
 export async function GET() {
   try {
@@ -12,7 +12,7 @@ export async function GET() {
     }
 
     // Get candidate profile from database
-    const candidate = await prisma.candidate.findFirst({
+    const candidate = await db.candidate.findFirst({
       where: {
         email: session.user.email
       },
@@ -70,7 +70,7 @@ export async function PUT(request: Request) {
     const { phone, stateOfOrigin, lga } = body
 
     // Update candidate profile
-    const updatedCandidate = await prisma.candidate.updateMany({
+    const updatedCandidate = await db.candidate.updateMany({
       where: {
         email: session.user.email
       },
@@ -86,7 +86,7 @@ export async function PUT(request: Request) {
     }
 
     // Get the updated candidate
-    const candidate = await prisma.candidate.findFirst({
+    const candidate = await db.candidate.findFirst({
       where: {
         email: session.user.email
       }

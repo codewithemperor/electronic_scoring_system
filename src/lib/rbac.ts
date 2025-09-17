@@ -17,6 +17,13 @@ export const ROLES = {
       'view_audit_logs'
     ]
   },
+   CANDIDATE: {
+    name: 'Candidate',
+    permissions: [
+      'take_tests',
+      'view_own_results'
+    ]
+  },
   STAFF: {
     name: 'Staff',
     permissions: [

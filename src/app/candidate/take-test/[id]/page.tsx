@@ -473,17 +473,21 @@ Good luck!`}
                   onValueChange={(value) => handleAnswerSelect(currentQuestion.id, value)}
                   className="space-y-3"
                 >
-                  {currentQuestion.options.map((option, index) => (
-                    <div key={index} className="flex items-center space-x-2">
-                      <RadioGroupItem value={option} id={`option-${index}`} />
-                      <Label
-                        htmlFor={`option-${index}`}
-                        className="flex-1 cursor-pointer p-3 border rounded-lg hover:bg-gray-50 transition-colors"
-                      >
-                        {option}
-                      </Label>
-                    </div>
-                  ))}
+                  {currentQuestion.options.map((option, index) => {
+                    // Extract the letter part (A, B, C, D) from the option string
+                    const optionLetter = option.trim().charAt(0)
+                    return (
+                      <div key={index} className="flex items-center space-x-2">
+                        <RadioGroupItem value={optionLetter} id={`option-${index}`} />
+                        <Label
+                          htmlFor={`option-${index}`}
+                          className="flex-1 cursor-pointer p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+                        >
+                          {option}
+                        </Label>
+                      </div>
+                    )
+                  })}
                 </RadioGroup>
 
                 <div className="flex items-center justify-between pt-4 border-t">

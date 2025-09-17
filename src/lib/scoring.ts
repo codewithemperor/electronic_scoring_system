@@ -223,16 +223,9 @@ export class ScoringEngine {
       }
     })
 
-    // Save individual test scores
-    const testScores = scoreResult.subjectBreakdown.map(subjectScore => ({
-      candidateId,
-      marks: subjectScore.score,
-      scoredById,
-    }))
-
-    await db.testScore.createMany({
-      data: testScores
-    })
+    // Note: Individual question scores should be saved when processing each answer
+    // This method now only updates the candidate's overall score
+    // The individual question scores are saved separately during test submission
   }
 
   /**

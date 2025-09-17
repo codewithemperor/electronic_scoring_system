@@ -13,7 +13,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    if (!hasPermission(session.user.role as any, "score_tests")) {
+    // Allow candidates to submit their own tests, or staff/examiners to score tests
+    const canSubmitTest = hasPermission(session.user.role as any, "take_tests")
+    const canScoreTests = hasPermission(session.user.role as any, "score_tests")
+    
+    if (!canSubmitTest && !canScoreTests) {
       return NextResponse.json({ error: "Insufficient permissions" }, { status: 403 })
     }
 
@@ -25,6 +29,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "Invalid input data" },
         { status: 400 }
+      )
+    }
+
+    // Security check: Candidates can only submit their own tests
+    if (canSubmitTest && !canScoreTests && session.user.id !== candidateId) {
+      return NextResponse.json(
+        { error: "You can only submit your own tests" },
+        { status: 403 }
       )
     }
 

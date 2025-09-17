@@ -305,7 +305,7 @@ export default function TestSuccessPage() {
           </Button>
           
           <Button 
-            onClick={() => router.push("/")}
+            onClick={() => router.push("/candidate/dashboard")}
             className="flex-1"
           >
             <Home className="h-4 w-4 mr-2" />
