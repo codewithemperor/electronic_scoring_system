@@ -26,6 +26,10 @@ export const candidateRegistrationSchema = z.object({
   middleName: z.string().optional(),
   email: z.string().email("Invalid email address"),
   phone: z.string().min(10, "Phone number must be at least 10 characters"),
+  password: z.string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 
+           "Password must contain at least one uppercase letter, one lowercase letter, and one number"),
   dateOfBirth: z.date(),
   gender: z.enum(["MALE", "FEMALE"]),
   stateOfOrigin: z.string().min(2, "State of origin is required"),

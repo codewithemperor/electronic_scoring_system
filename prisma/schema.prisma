@@ -131,6 +131,7 @@ model Candidate {
   middleName      String?
   email           String
   phone           String
+  password        String  
   dateOfBirth     DateTime
   gender          Gender
   stateOfOrigin   String

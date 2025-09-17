@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { candidateRegistrationSchema } from "@/lib/validations"
+import bcryptjs from 'bcryptjs'
 
 function generateRegistrationNumber(): string {
   const timestamp = Date.now().toString().slice(-6)
@@ -91,8 +92,15 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
+    console.log("🔍 Received body:", body)
+    
+    // Convert dateOfBirth string to Date object before validation
+    if (body.dateOfBirth && typeof body.dateOfBirth === 'string') {
+      body.dateOfBirth = new Date(body.dateOfBirth)
+    }
+    
     const validatedData = candidateRegistrationSchema.parse(body)
-
+    
     // Check if candidate already exists
     const existingCandidate = await db.candidate.findFirst({
       where: {
@@ -111,6 +119,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Hash the password (make sure you have bcryptjs installed)
+    const bcrypt = require('bcryptjs')
+    const hashedPassword = await bcrypt.hash(validatedData.password, 12)
+
     // Generate registration number
     const registrationNumber = generateRegistrationNumber()
 
@@ -118,8 +130,9 @@ export async function POST(request: NextRequest) {
     const candidate = await db.candidate.create({
       data: {
         ...validatedData,
+        password: hashedPassword, // Store hashed password
         registrationNumber,
-        dateOfBirth: new Date(validatedData.dateOfBirth),
+        dateOfBirth: validatedData.dateOfBirth, // This is now a proper Date object
         olevelResults: validatedData.olevelResults,
       },
       include: {
@@ -146,10 +159,14 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       message: "Candidate registered successfully",
-      candidate,
+      candidate: {
+        ...candidate,
+        password: undefined, // Don't return the password
+      },
       registrationNumber,
     }, { status: 201 })
   } catch (error) {
+    console.error("API Error:", error)
     if (error instanceof Error && error.name === "ZodError") {
       return NextResponse.json(
         { error: "Validation failed", details: error.message },
@@ -157,7 +174,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.error("Failed to create candidate:", error)
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
