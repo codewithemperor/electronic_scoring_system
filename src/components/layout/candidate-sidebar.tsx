@@ -38,22 +38,10 @@ const sidebarItems = [
     description: "View and edit your information"
   },
   {
-    title: "Available Tests",
-    href: "/candidate/available-tests",
-    icon: BookOpen,
-    description: "View and start available tests"
-  },
-  {
     title: "Test Results",
     href: "/candidate/test-results",
     icon: TrendingUp,
     description: "View your test scores and results"
-  },
-  {
-    title: "Registration",
-    href: "/candidate/register",
-    icon: ClipboardList,
-    description: "Update registration details"
   }
 ]
 
@@ -80,9 +68,9 @@ export function CandidateSidebar({ className }: CandidateSidebarProps) {
       
       {/* Sidebar */}
       <div className={cn(
-        "fixed left-0 top-0 z-50 h-full bg-white border-r transition-all duration-300",
+        "fixed left-0 top-0 z-50 h-full bg-white border-r transition-all duration-300 flex-shrink-0",
         isCollapsed ? "w-16" : "w-64",
-        "lg:relative lg:translate-x-0",
+        "lg:relative lg:translate-x-0 lg:flex",
         isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
         className
       )}>
@@ -200,7 +188,7 @@ export function CandidateSidebar({ className }: CandidateSidebarProps) {
       <Button
         variant="ghost"
         size="sm"
-        className="lg:hidden fixed top-4 left-4 z-40"
+        className="lg:hidden fixed top-4 left-4 z-40 bg-white/80 backdrop-blur-sm border"
         onClick={() => setIsMobileOpen(true)}
       >
         <Menu className="h-4 w-4" />
@@ -215,10 +203,10 @@ interface CandidateLayoutProps {
 
 export function CandidateLayout({ children }: CandidateLayoutProps) {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex">
       <CandidateSidebar />
-      <main className="lg:ml-64">
-        <div className="p-4 lg:p-8 pt-16 lg:pt-8">
+      <main className="flex-1 lg:ml-0">
+        <div className="p-4 lg:p-8 pt-20 lg:pt-8 min-h-screen">
           {children}
         </div>
       </main>

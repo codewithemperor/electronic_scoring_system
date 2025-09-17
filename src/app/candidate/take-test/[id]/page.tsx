@@ -109,8 +109,9 @@ export default function TakeTestPage() {
       // Fetch candidate details
       const candidateResponse = await fetch(`/api/candidates/${candidateId}`)
       if (!candidateResponse.ok) {
-        toast.error("Candidate not found")
-        router.push("/")
+        const errorData = await candidateResponse.json()
+        toast.error(errorData.error || "Candidate not found")
+        router.push("/candidate/dashboard")
         return
       }
       const candidateData = await candidateResponse.json()
@@ -119,14 +120,16 @@ export default function TakeTestPage() {
       // Check if candidate has already written the test
       if (candidateData.hasWritten) {
         toast.error("You have already completed this test")
-        router.push("/candidate/check-result")
+        router.push("/candidate/dashboard")
         return
       }
 
       // Fetch questions
       const questionsResponse = await fetch(`/api/candidates/${candidateId}/questions`)
       if (!questionsResponse.ok) {
-        toast.error("Failed to load questions")
+        const errorData = await questionsResponse.json()
+        toast.error(errorData.error || "Failed to load questions")
+        router.push("/candidate/dashboard")
         return
       }
       const questionsData = await questionsResponse.json()
@@ -138,6 +141,7 @@ export default function TakeTestPage() {
     } catch (error) {
       console.error("Failed to fetch test data:", error)
       toast.error("Failed to load test")
+      router.push("/candidate/dashboard")
     } finally {
       setLoading(false)
     }
@@ -266,8 +270,8 @@ export default function TakeTestPage() {
               <p className="text-gray-600 mb-4">
                 Unable to load the test. Please contact support.
               </p>
-              <Button onClick={() => router.push("/")}>
-                Go to Home
+              <Button onClick={() => router.push("/candidate/dashboard")}>
+                Go to Dashboard
               </Button>
             </div>
           </CardContent>

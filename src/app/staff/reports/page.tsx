@@ -131,10 +131,12 @@ export default function StaffReportsPage() {
       const response = await fetch("/api/staff/reports")
       if (response.ok) {
         const data = await response.json()
-        setReports(data)
+        // Ensure data is always an array, fallback to empty array
+        setReports(Array.isArray(data) ? data : [])
       }
     } catch (error) {
       console.error("Failed to fetch reports:", error)
+      setReports([]) // Set empty array on error
     } finally {
       setLoading(false)
     }
@@ -234,11 +236,13 @@ export default function StaffReportsPage() {
     }
   }
 
-  const filteredReports = reports.filter(report =>
-    report.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    report.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (report.screening && report.screening.name.toLowerCase().includes(searchTerm.toLowerCase()))
-  )
+  const filteredReports = Array.isArray(reports) ? reports.filter(report =>
+    report && typeof report === 'object' && (
+      (report.title && report.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (report.type && report.type.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (report.screening && report.screening.name && report.screening.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    )
+  ) : []
 
   const getReportTypeColor = (type: string) => {
     switch (type) {
@@ -433,7 +437,7 @@ export default function StaffReportsPage() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="font-bold text-lg">{candidate.percentage.toFixed(1)}%</div>
+                        <div className="font-bold text-lg">{candidate.percentage.toFixed(1)|| 0}%</div>
                         <div className="text-sm text-gray-500">
                           {candidate.totalScore} marks
                         </div>

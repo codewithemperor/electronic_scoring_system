@@ -192,6 +192,7 @@ model Question {
   
   screening   Screening? @relation(fields: [screeningId], references: [id])
   subject     Subject    @relation(fields: [subjectId], references: [id])
+  testScores  TestScore[]
   
   @@map("questions")
 }
@@ -216,7 +217,7 @@ model ProgramTest {
 model TestScore {
   id             String   @id @default(cuid())
   candidateId    String
-  questionId     String?
+  questionId     String
   selectedAnswer String?
   isCorrect      Boolean?
   marks          Float    @default(0)
@@ -225,6 +226,7 @@ model TestScore {
   createdAt      DateTime @default(now())
   
   candidate      Candidate @relation(fields: [candidateId], references: [id])
+  question       Question  @relation(fields: [questionId], references: [id])
   scoredBy       User?     @relation("ScoredBy", fields: [scoredById], references: [id])
   
   @@map("test_scores")

@@ -26,6 +26,7 @@ import {
   User,
   Bell,
   Search,
+  Backpack,
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -39,6 +40,7 @@ const navigation = {
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "Users", href: "/admin/users", icon: Users },
     { name: "Screenings", href: "/admin/screenings", icon: ClipboardList },
+    { name: "Tests", href: "/admin/program-tests", icon: Backpack },
     { name: "Questions", href: "/admin/questions", icon: BookOpen },
     { name: "Reports", href: "/admin/reports", icon: FileText },
     { name: "Settings", href: "/admin/settings", icon: Settings },
@@ -46,6 +48,7 @@ const navigation = {
   ADMIN: [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "Screenings", href: "/admin/screenings", icon: ClipboardList },
+    { name: "Tests", href: "/admin/program-tests", icon: Backpack },
     { name: "Questions", href: "/admin/questions", icon: BookOpen },
     { name: "Reports", href: "/admin/reports", icon: FileText },
     { name: "Settings", href: "/admin/settings", icon: Settings },
@@ -59,6 +62,7 @@ const navigation = {
   ],
   EXAMINER: [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+    { name: "Tests", href: "/examiner/program-tests", icon: Backpack },
     { name: "Questions", href: "/examiner/questions", icon: BookOpen },
     { name: "Screenings", href: "/examiner/screenings", icon: ClipboardList },
     { name: "Scoring", href: "/examiner/scoring", icon: FileText },

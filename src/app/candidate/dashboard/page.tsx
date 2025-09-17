@@ -90,12 +90,28 @@ export default function CandidateDashboard() {
         completedResponse.json()
       ])
 
-      setStats(statsData)
-      setUpcomingTests(upcomingData)
-      setCompletedTests(completedData)
+      // Validate and set stats data with fallbacks
+      setStats({
+        registeredScreenings: Number(statsData.registeredScreenings) || 0,
+        completedTests: Number(statsData.completedTests) || 0,
+        pendingTests: Number(statsData.pendingTests) || 0,
+        averageScore: String(statsData.averageScore) || "0.0"
+      })
+      setUpcomingTests(Array.isArray(upcomingData) ? upcomingData : [])
+      setCompletedTests(Array.isArray(completedData) ? completedData : [])
 
     } catch (err) {
+      console.error("Dashboard data fetch error:", err)
       setError(err instanceof Error ? err.message : "An error occurred")
+      // Set fallback data
+      setStats({
+        registeredScreenings: 0,
+        completedTests: 0,
+        pendingTests: 0,
+        averageScore: "0.0"
+      })
+      setUpcomingTests([])
+      setCompletedTests([])
     } finally {
       setLoading(false)
     }
@@ -103,9 +119,11 @@ export default function CandidateDashboard() {
 
   if (status === "loading") {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-      </div>
+      <CandidateLayout>
+        <div className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+        </div>
+      </CandidateLayout>
     )
   }
 
@@ -115,13 +133,18 @@ export default function CandidateDashboard() {
 
   const userName = `${session.user.firstName} ${session.user.lastName}`
 
-  // Get candidate stats from API data
+  // Get candidate stats from API data with proper null checks
   const candidateStats = stats ? [
-    { name: "Registered Screenings", value: stats.registeredScreenings.toString(), icon: Calendar, color: "text-blue-600" },
-    { name: "Completed Tests", value: stats.completedTests.toString(), icon: CheckCircle, color: "text-green-600" },
-    { name: "Pending Tests", value: stats.pendingTests.toString(), icon: Clock, color: "text-orange-600" },
-    { name: "Average Score", value: stats.averageScore, icon: Award, color: "text-purple-600" },
-  ] : []
+    { name: "Registered Screenings", value: (stats.registeredScreenings || 0).toString(), icon: Calendar, color: "text-blue-600" },
+    { name: "Completed Tests", value: (stats.completedTests || 0).toString(), icon: CheckCircle, color: "text-green-600" },
+    { name: "Pending Tests", value: (stats.pendingTests || 0).toString(), icon: Clock, color: "text-orange-600" },
+    { name: "Average Score", value: stats.averageScore || "0.0", icon: Award, color: "text-purple-600" },
+  ] : [
+    { name: "Registered Screenings", value: "0", icon: Calendar, color: "text-blue-600" },
+    { name: "Completed Tests", value: "0", icon: CheckCircle, color: "text-green-600" },
+    { name: "Pending Tests", value: "0", icon: Clock, color: "text-orange-600" },
+    { name: "Average Score", value: "0.0", icon: Award, color: "text-purple-600" },
+  ]
 
   return (
     <CandidateLayout>
@@ -330,7 +353,7 @@ export default function CandidateDashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Link href="/candidate/profile">
                 <Button variant="outline" className="w-full justify-start h-auto p-4">
                   <User className="h-5 w-5 mr-3" />
@@ -346,15 +369,6 @@ export default function CandidateDashboard() {
                   <div className="text-left">
                     <div className="font-medium">View All Results</div>
                     <div className="text-sm text-gray-500">Check your performance</div>
-                  </div>
-                </Button>
-              </Link>
-              <Link href="/candidate/available-tests">
-                <Button variant="outline" className="w-full justify-start h-auto p-4">
-                  <BookOpen className="h-5 w-5 mr-3" />
-                  <div className="text-left">
-                    <div className="font-medium">Browse Tests</div>
-                    <div className="text-sm text-gray-500">See all available tests</div>
                   </div>
                 </Button>
               </Link>

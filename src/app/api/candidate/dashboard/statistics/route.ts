@@ -21,7 +21,8 @@ export async function GET(request: NextRequest) {
         email: session.user.email
       },
       include: {
-        screening: true
+        screening: true,
+        testScores: true
       }
     })
 
@@ -29,23 +30,26 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Candidate not found" }, { status: 404 })
     }
 
-    // Get upcoming tests (screenings that are active and candidate hasn't completed)
-    const upcomingTests = []
+    // Calculate statistics
+    const registeredScreenings = candidate.screening ? 1 : 0
+    const completedTests = candidate.hasWritten ? 1 : 0
+    const pendingTests = candidate.screening && !candidate.hasWritten ? 1 : 0
     
-    if (candidate.screening && candidate.screening.status === "ACTIVE" && !candidate.hasWritten) {
-      upcomingTests.push({
-        id: candidate.screening.id,
-        title: candidate.screening.name,
-        date: candidate.screening.startDate.toISOString().split('T')[0],
-        time: "10:00 AM", // Default time, could be stored in screening
-        duration: `${candidate.screening.duration} minutes`,
-        status: "SCHEDULED"
-      })
+    // Calculate average score from test scores
+    const totalScore = candidate.testScores.reduce((sum, score) => sum + (score.marks || 0), 0)
+    const totalPossibleScore = candidate.testScores.length * 1 // Assuming each question is worth 1 mark
+    const averageScore = totalPossibleScore > 0 ? ((totalScore / totalPossibleScore) * 100).toFixed(1) : "0.0"
+
+    const statistics = {
+      registeredScreenings,
+      completedTests,
+      pendingTests,
+      averageScore
     }
 
-    return NextResponse.json(upcomingTests)
+    return NextResponse.json(statistics)
   } catch (error) {
-    console.error("Failed to fetch candidate upcoming tests:", error)
+    console.error("Failed to fetch candidate statistics:", error)
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
